@@ -4,19 +4,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Timetable planner</title>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap"
+    <title>Hōräe</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@1,500&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #eef1f5;
+            --bg: #fff0f7;
             --panel: #fff;
-            --ink: #14202b;
-            --mute: #5d6b7a;
-            --line: #d8dee6;
-            --acc: #2f5bea;
-            --bad: #e5334b;
-            --ok: #1d8a4e;
+            --ink: #3b1f33;
+            --mute: #8a6a80;
+            --line: #f3d3e3;
+            --acc: #d6459a;
+            --bad: #d90429;
+            --ok: #2f9e6e;
             box-sizing: border-box;
             padding-top: env(safe-area-inset-top, 0px);
             padding-bottom: env(safe-area-inset-bottom, 0px)
@@ -24,26 +25,26 @@
 
         @media (prefers-color-scheme:dark) {
             :root:not([data-theme="light"]) {
-                --bg: #10161d;
-                --panel: #18212b;
-                --ink: #e8edf2;
-                --mute: #97a4b2;
-                --line: #2b3744;
-                --acc: #7b9bff;
-                --bad: #ff6b7f;
-                --ok: #4cc585
+                --bg: #1d1220;
+                --panel: #2a1a2e;
+                --ink: #fbe8f3;
+                --mute: #c6a3b9;
+                --line: #4a2f4d;
+                --acc: #ff8fc7;
+                --bad: #ff6b81;
+                --ok: #6fdcab
             }
         }
 
         :root[data-theme="dark"] {
-            --bg: #10161d;
-            --panel: #18212b;
-            --ink: #e8edf2;
-            --mute: #97a4b2;
-            --line: #2b3744;
-            --acc: #7b9bff;
-            --bad: #ff6b7f;
-            --ok: #4cc585
+            --bg: #1d1220;
+            --panel: #2a1a2e;
+            --ink: #fbe8f3;
+            --mute: #c6a3b9;
+            --line: #4a2f4d;
+            --acc: #ff8fc7;
+            --bad: #ff6b81;
+            --ok: #6fdcab
         }
 
         html {
@@ -364,7 +365,7 @@
             right: 3px;
             border: 2px dashed var(--acc);
             border-radius: 5px;
-            background: rgba(47, 91, 234, .12);
+            background: rgba(214, 69, 154, .14);
             pointer-events: none
         }
 
@@ -511,6 +512,116 @@
             font-size: 12px;
             margin: 8px 2px 0
         }
+
+        body {
+            background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 12%, var(--bg)), var(--bg) 340px) no-repeat var(--bg)
+        }
+
+        header h1 {
+            font-family: Fraunces, Georgia, serif;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 34px;
+            letter-spacing: 0;
+            color: var(--acc)
+        }
+
+        .panel {
+            border-radius: 18px;
+            box-shadow: 0 6px 24px color-mix(in srgb, var(--acc) 10%, transparent)
+        }
+
+        button {
+            border-radius: 999px
+        }
+
+        input,
+        select {
+            border-radius: 10px
+        }
+
+        input[type=checkbox] {
+            accent-color: var(--acc)
+        }
+
+        .grid {
+            border-radius: 14px
+        }
+
+        #auth {
+            background: radial-gradient(55% 45% at 12% 8%, color-mix(in srgb, var(--acc) 30%, transparent), transparent 70%), radial-gradient(50% 45% at 92% 18%, color-mix(in srgb, #b79cff 32%, transparent), transparent 70%), radial-gradient(60% 55% at 70% 100%, color-mix(in srgb, #ffb48a 28%, transparent), transparent 70%), var(--bg)
+        }
+
+        .authbox {
+            max-width: 390px;
+            padding: 30px 26px;
+            border-radius: 28px;
+            box-shadow: 0 24px 70px color-mix(in srgb, var(--acc) 22%, transparent)
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 18px
+        }
+
+        .logo {
+            font-family: Fraunces, Georgia, serif;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 56px;
+            line-height: 1;
+            color: var(--acc)
+        }
+
+        .brand p {
+            margin: 8px auto 0;
+            max-width: 30ch;
+            color: var(--mute);
+            font-size: 13.5px
+        }
+
+        .pills {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 12px
+        }
+
+        .pills span {
+            color: #3b1f33;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 99px
+        }
+
+        .authbox h2 {
+            text-align: center;
+            font-size: 17px;
+            margin-bottom: 4px
+        }
+
+        .authbox input {
+            border-radius: 99px;
+            padding: 10px 16px
+        }
+
+        .authbox button.pri,
+        .authbox .btns button.pri {
+            background: linear-gradient(135deg, #ff8fc7, #c7a6ff);
+            border: 0;
+            color: #3b1f33;
+            padding: 12px;
+            font-weight: 700
+        }
+
+        .authbox .btns {
+            justify-content: center
+        }
+
+        .authbox .btns[style] {
+            align-items: center !important
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -518,7 +629,14 @@
 <body class="locked">
     <div id="auth" role="dialog" aria-labelledby="at">
         <form id="af" class="panel authbox">
-            <h1 style="font-size:18px;margin-bottom:12px">Timetable planner</h1>
+            <div class="brand">
+                <div class="logo">Hōräe</div>
+                <p>Plan your trimester, spot class clashes before you register, and keep your timetable on every device.
+                </p>
+                <div class="pills"><span style="background:#ffd1e8">Mon · 09:00</span><span
+                        style="background:#e3d4ff">Wed · 14:00</span><span style="background:#ffe3d1">Fri · 11:00</span>
+                </div>
+            </div>
             <h2 id="at">Log in</h2>
             <label for="ae">Email</label><input id="ae" type="email" autocomplete="email" required>
             <label for="ap">Password</label><input id="ap" type="password" minlength="6" autocomplete="current-password"
@@ -532,8 +650,8 @@
     </div>
     <header>
         <div>
-            <h1>Timetable planner</h1>
-            <p>Drag classes onto the week. Anything that overlaps turns red.</p>
+            <h1>Hōräe</h1>
+            <p>Plan your trimester: drag classes onto the week and see clashes before you register.</p>
         </div>
         <div class="acct"><small id="who"></small><small id="sync"></small><button id="logout">Log out</button><button
                 id="theme"></button></div>
@@ -798,8 +916,8 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             const t = S.title || 'My timetable'; fit(x, t, Wp - 2 * m, 36 * k); x.fillText(t, Wp / 2, Hp * .305);
             paint(x, m, Hp * .34, Wp - 2 * m, Hp * .58, k, false); out(c, slug() + '-wallpaper.png');
         };
-        $('ttname').value = S.title; document.title = S.title || 'Timetable planner';
-        $('ttname').oninput = e => {S.title = e.target.value; document.title = S.title || 'Timetable planner'; saveS()};
+        $('ttname').value = S.title; document.title = S.title || 'Hōräe';
+        $('ttname').oninput = e => {S.title = e.target.value; document.title = S.title || 'Hōräe'; saveS()};
         $('wsize').value = S.ws; $('wsize').onchange = e => {S.ws = e.target.value; saveS()};
         theme(); render();
 
@@ -808,7 +926,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in';
         try {sb = window.supabase.createClient(SB_URL, SB_KEY)} catch (_) { }
         const amsg = (t, ok) => {$('am').textContent = t || ''; $('am').className = ok ? 'info' : ''};
-        function applyUI() {setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Timetable planner'; theme()}
+        function applyUI() {setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Hōräe'; theme()}
         function push() {
             if (!sb || !user || !cloudReady) return;
             $('sync').textContent = 'Saving…'; clearTimeout(timer);
