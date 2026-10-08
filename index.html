@@ -1013,6 +1013,51 @@
         body.viewonly #sharebar {
             display: flex
         }
+
+        .srow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .srow:last-child {
+            border: 0
+        }
+
+        .srow select {
+            width: auto
+        }
+
+        .pgrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        .pc {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 10px;
+            text-align: center;
+            color: var(--mute);
+            font-size: 12px
+        }
+
+        .pc b {
+            display: block;
+            font-size: 22px;
+            color: var(--acc)
+        }
+
+        .cks {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 6px 0
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1049,7 +1094,7 @@
     </header>
     <nav id="tabs"><button data-v="dash">Dashboard</button><button data-v="tt">Timetable</button><button
             data-v="cal">Calendar</button><button data-v="asg">Assignments</button><button data-v="share">Share &amp;
-            compare</button></nav>
+            compare</button><button data-v="prof">Profile</button><button data-v="set">Settings</button></nav>
     <div id="sharebar"><b id="sbt"></b><span style="flex:1"></span><button id="sbadd">Add to my compare
             list</button><button class="pri" id="sbopen">Open Hōräe</button></div>
     <main id="v-tt" hidden>
@@ -1190,14 +1235,16 @@
             </div>
         </div>
     </section>
+    <section class="view" id="v-prof" hidden></section>
+    <section class="view" id="v-set" hidden></section>
     <script>
-        let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in', A = [], EV = [], FR = [], RO = false, curV = 'dash';
-        const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], T0 = 360, T1 = 1440, PX = .8;
+        let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in', A = [], EV = [], FR = [], SN = [], RO = false, curV = 'dash';
+        const BASE = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; let DAYS = BASE.slice(); const T0 = 360, T1 = 1440, PX = .8;
         let DEF = { wk: false, v0: 480, v1: 1380, theme: null, title: 'Trimester 2 timetable', ws: '1179x2556', t0: '2027-01-04', wks: 14, name: '' };
         let S = { ...DEF }, V0 = 480, V1 = 1380, VD = DAYS, LN = {}, CLS = new Set(), sel = new Set(), ccol = null, cchg = false;
         try { Object.assign(S, JSON.parse(localStorage.getItem('tt-set') || '{}')) } catch (_) { }
         const saveS = () => { if (RO) return; try { localStorage.setItem('tt-set', JSON.stringify(S)) } catch (_) { } stamp() };
-        const tm = s => { const [a, b] = s.split(':'); return +a * 60 + +b }, ft = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+        const tm = s => { const [a, b] = s.split(':'); return +a * 60 + +b }, ft24 = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'), ft = m => (S.pf && S.pf.h24 === false) ? ((h, mm) => (h % 12 || 12) + (mm ? ':' + String(mm).padStart(2, '0') : '') + (h < 12 ? ' AM' : ' PM'))(Math.floor(m / 60) % 24, m % 60) : ft24(m);
         const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const SEED = `CSD1171 - Q1|Tue|10:00|12:00|Wk14 · E2-08-02
 CSD1171 - L2|Wed|09:00|11:00|Lectorial 9 · Wk1-6,8-13
@@ -1234,7 +1281,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         const ov = (a, b) => a.d === b.d && a.s < b.e && b.s < a.e;
 
         function render() {
-            VD = S.wk ? DAYS : DAYS.slice(0, 5); V0 = S.v0; V1 = S.v1;
+            VD = S.wk ? DAYS : DAYS.filter(d => d !== 'Sat' && d !== 'Sun'); V0 = S.v0; V1 = S.v1;
             const pl = items.filter(i => i.p), clash = new Set(), pairs = [];
             pl.forEach((a, i) => pl.slice(i + 1).forEach(b => { if (ov(a, b)) { clash.add(a.id); clash.add(b.id); pairs.push([a, b]) } }));
             const lane = {};
@@ -1308,7 +1355,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         // form
         function setForm(it) {
             editing = it ? it.id : null; ccol = it && it.c || null; cchg = false;
-            $('n').value = it ? it.n : ''; $('d').value = it ? it.d : 'Mon'; $('s').value = it ? ft(it.s) : '09:00'; $('e').value = it ? ft(it.e) : '11:00'; $('o').value = it ? it.o || '' : '';
+            $('n').value = it ? it.n : ''; $('d').value = it ? it.d : 'Mon'; $('s').value = it ? ft24(it.s) : '09:00'; $('e').value = it ? ft24(it.e) : '11:00'; $('o').value = it ? it.o || '' : '';
             $('c').value = ccol || '#888888'; $('cl').textContent = ccol ? 'Custom' : 'Auto';
             $('ftitle').textContent = it ? 'Edit class' : 'Add a class'; $('save').textContent = it ? 'Save changes' : 'Add to timetable';
             $('del').hidden = $('cancel').hidden = !it; $('msg').textContent = '';
@@ -1405,26 +1452,26 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
 
         // ---- planner: dashboard, calendar, assignments, sharing ----
         const HOL = { '2026-11-09': 'Deepavali (observed)', '2026-12-25': 'Christmas Day', '2027-01-01': "New Year's Day", '2027-02-06': 'Chinese New Year', '2027-02-07': 'Chinese New Year', '2027-02-08': 'Chinese New Year (observed)', '2027-03-10': 'Hari Raya Puasa', '2027-03-26': 'Good Friday', '2027-05-01': 'Labour Day', '2027-05-17': 'Hari Raya Haji', '2027-05-20': 'Vesak Day', '2027-08-09': 'National Day', '2027-10-28': 'Deepavali', '2027-12-25': 'Christmas Day' };
-        try { const o = JSON.parse(localStorage.getItem('tt-pl') || '{}'); A = o.a || []; EV = o.e || [] } catch (_) { }
+        try { const o = JSON.parse(localStorage.getItem('tt-pl') || '{}'); A = o.a || []; EV = o.e || []; SN = o.sn || [] } catch (_) { }
         try { FR = JSON.parse(localStorage.getItem('tt-fr') || '[]') } catch (_) { }
-        const saveP = () => { if (RO) return; try { localStorage.setItem('tt-pl', JSON.stringify({ a: A, e: EV })) } catch (_) { } stamp() };
+        const saveP = () => { if (RO) return; try { localStorage.setItem('tt-pl', JSON.stringify({ a: A, e: EV, sn: SN })) } catch (_) { } stamp() };
         const saveF = () => { try { localStorage.setItem('tt-fr', JSON.stringify(FR)) } catch (_) { } };
         const pd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) };
         const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         const addD = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x };
         const DN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], ST = [['todo', 'Not started'], ['prog', 'In progress'], ['done', 'Completed']];
         const wkOf = d => Math.floor(Math.round((pd(iso(d)) - pd(S.t0)) / 864e5) / 7) + 1;
-        const fmtD = k => pd(k).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-        const defName = () => (user && user.email || '').split('@')[0];
+        const fmtD = k => pd(k).toLocaleDateString(LOC(), { weekday: 'short', day: 'numeric', month: 'short' });
+        const defName = () => S.name || (user && user.email || '').split('@')[0];
         const nodeUid = () => 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
         function wspec(o) { const m = /Wk\s*([\d,\-]+)/i.exec(o || ''); if (!m) return null; const r = new Set(); m[1].split(',').forEach(p => { const [a, b] = p.split('-').map(Number); if (!b) r.add(a); else for (let k = a; k <= b; k++)r.add(k) }); return r }
         function classesOn(d) { const w = wkOf(d); if (w < 1 || w > S.wks) return []; return items.filter(i => i.p && i.d === DN[d.getDay()] && (!wspec(i.o) || wspec(i.o).has(w))).sort((a, b) => a.s - b.s) }
-        function entries(d) {
-            const k = iso(d), o = [];
-            if (HOL[k]) o.push({ k: 'h', t: HOL[k], time: 'Public holiday', s: -2 });
-            EV.filter(e => e.d === k).forEach(e => o.push({ k: 'e', t: e.t, time: e.tm || 'All day', s: e.tm ? tm(e.tm) : -1 }));
-            A.filter(a => a.d === k).forEach(a => o.push({ k: 'a', t: a.m + ': ' + a.t, time: 'Due ' + (a.tm || '23:59'), s: tm(a.tm || '23:59'), done: a.st === 'done' }));
-            classesOn(d).forEach(i => o.push({ k: 'c', t: i.n, time: ft(i.s) + '–' + ft(i.e), sub: i.o, s: i.s, i }));
+        function entries(d, all) {
+            const L = k => all || pf(k); const k = iso(d), o = [];
+            if (HOL[k] && L('lh')) o.push({ k: 'h', t: HOL[k], time: 'Public holiday', s: -2 });
+            (L('le') ? EV : []).filter(e => e.d === k).forEach(e => o.push({ k: 'e', t: e.t, time: e.tm ? ft(tm(e.tm)) : 'All day', s: e.tm ? tm(e.tm) : -1 }));
+            (L('la') ? A : []).filter(a => a.d === k).forEach(a => o.push({ k: 'a', t: a.m + ': ' + a.t, time: 'Due ' + ft(tm(a.tm || '23:59')), s: tm(a.tm || '23:59'), done: a.st === 'done' }));
+            (L('lc') ? classesOn(d) : []).forEach(i => o.push({ k: 'c', t: i.n, time: ft(i.s) + '–' + ft(i.e), sub: i.o, s: i.s, i }));
             return o.sort((a, b) => a.s - b.s)
         }
         function left(a) { if (a.st === 'done') return { t: 'Completed', c: 'ok' }; const ms = new Date(a.d + 'T' + (a.tm || '23:59')) - Date.now(), ab = Math.abs(ms), d = Math.floor(ab / 864e5), h = Math.floor(ab % 864e5 / 36e5), m = Math.floor(ab % 36e5 / 6e4), t = d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`; return ms < 0 ? { t: 'Overdue by ' + t, c: 'bad' } : { t: t + ' left', c: ms < 1728e5 ? 'warn' : '' } }
@@ -1435,24 +1482,24 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         const li = (c, t, sub, r) => `<div class="li"><span class="dot" style="background:${c}"></span><div class="m"><b>${esc(t)}</b><small>${esc(sub)}</small></div>${r || ''}</div>`;
 
         function go(v) {
-            curV = v;['dash', 'tt', 'cal', 'asg', 'share'].forEach(k => $('v-' + k).hidden = k !== v);
+            curV = v;['dash', 'tt', 'cal', 'asg', 'share', 'prof', 'set'].forEach(k => $('v-' + k).hidden = k !== v);
             document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
-            ({ dash: renderDash, cal: renderCal, asg: renderAsg, tt: () => { }, share: () => { $('shname').value = S.name || defName(); renderShare() } })[v]()
+            ({ dash: renderDash, cal: renderCal, asg: renderAsg, tt: () => { }, share: () => { $('shname').value = S.name || defName(); renderShare() }, prof: renderProfile, set: renderSettings })[v]()
         }
         $('tabs').onclick = e => { const b = e.target.closest('button'); if (b) go(b.dataset.v) };
 
         function renderDash() {
             const now = new Date(), nm = now.getHours() * 60 + now.getMinutes(), act = A.filter(a => a.st !== 'done').sort((x, y) => (x.d + x.tm).localeCompare(y.d + y.tm));
-            const td = entries(now), cl = td.filter(e => e.k === 'c'), w = wkOf(now), due7 = act.filter(a => new Date(a.d + 'T' + (a.tm || '23:59')) - now < 6048e5).length, dn = A.filter(a => a.st === 'done').length;
+            const td = entries(now, 1), cl = td.filter(e => e.k === 'c'), w = wkOf(now), due7 = act.filter(a => new Date(a.d + 'T' + (a.tm || '23:59')) - now < 6048e5).length, dn = A.filter(a => a.st === 'done').length;
             const up = []; for (let i = 0; i < 8 && up.length < 6; i++) { const d = addD(now, i); classesOn(d).forEach(c => { if (i > 0 || c.e > nm) up.push({ d, c, i }) }) }
-            const imp = []; for (let i = 0; i < 60 && imp.length < 6; i++) { const d = addD(now, i); entries(d).filter(e => e.k === 'h' || e.k === 'e').forEach(e => imp.push({ d, e })) }
+            const imp = []; for (let i = 0; i < 60 && imp.length < 6; i++) { const d = addD(now, i); entries(d, 1).filter(e => e.k === 'h' || e.k === 'e').forEach(e => imp.push({ d, e })) }
             const day = i => i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : DN[addD(new Date(), i).getDay()];
-            $('v-dash').innerHTML = `<div class="hello"><div><h2>Hi${defName() ? ', ' + esc(defName()) : ''} ✿</h2><small style="color:var(--mute)">${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}${w >= 1 && w <= S.wks ? ` · Week ${w} of ${S.wks}` : ''}</small></div>
+            $('v-dash').innerHTML = `<div class="hello"><div><h2>Hi${defName() ? ', ' + esc(defName()) : ''} ✿</h2><small style="color:var(--mute)">${now.toLocaleDateString(LOC(), { weekday: 'long', day: 'numeric', month: 'long' })}${w >= 1 && w <= S.wks ? ` · Week ${w} of ${S.wks}` : ''}</small></div>
     <div class="stats"><span class="stat">${cl.length} class${cl.length === 1 ? '' : 'es'} today</span><span class="stat">${due7} due this week</span><span class="stat">${dn}/${A.length} done</span></div></div>
   <div class="cards">
   <div class="panel"><h2>Today</h2>${td.map(e => li(e.k === 'c' ? bd(e.i) : e.k === 'a' ? 'var(--acc)' : e.k === 'h' ? '#4cc585' : '#b79cff', e.t, e.time + (e.sub ? ' · ' + e.sub : ''))).join('') || '<p class="hint">Nothing scheduled. Enjoy your day 🎀</p>'}</div>
   <div class="panel"><h2>Next classes</h2>${up.map(x => li(bd(x.c), x.c.n, `${day(x.i)} · ${ft(x.c.s)}–${ft(x.c.e)}${x.c.o ? ' · ' + x.c.o : ''}`)).join('') || (w < 1 ? `<p class="hint">Term starts ${fmtD(S.t0)} (in ${Math.ceil((pd(S.t0) - now) / 864e5)} days). Your classes will show here then.</p>` : '<p class="hint">No upcoming classes. Place classes in Timetable, and check the term dates in Calendar.</p>')}</div>
-  <div class="panel"><h2>Deadlines</h2>${act.slice(0, 6).map(a => { const l = left(a); return li('var(--acc)', a.t, `${a.m} · ${fmtD(a.d)} ${a.tm || ''}`, `<span class="pill2 ${l.c}">${l.t}</span>`) }).join('') || '<p class="hint">No active assignments 🎉</p>'}<div class="btns"><button onclick="go('asg')">Open assignments</button></div></div>
+  <div class="panel"><h2>Deadlines</h2>${act.slice(0, 6).map(a => { const l = left(a); return li('var(--acc)', a.t, `${a.m} · ${fmtD(a.d)} ${ft(tm(a.tm || '23:59'))}`, `<span class="pill2 ${l.c}">${l.t}</span>`) }).join('') || '<p class="hint">No active assignments 🎉</p>'}<div class="btns"><button onclick="go('asg')">Open assignments</button></div></div>
   <div class="panel"><h2>Important dates</h2>${imp.map(x => li(x.e.k === 'h' ? '#4cc585' : '#b79cff', x.e.t, fmtD(iso(x.d)) + ' · ' + x.e.time)).join('') || '<p class="hint">None coming up.</p>'}</div></div>`
         }
 
@@ -1460,7 +1507,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         function renderCal() {
             const d = CAL.d; let h = '', lab = '';
             if (CAL.m === 'month') {
-                const f = new Date(d.getFullYear(), d.getMonth(), 1), st = addD(f, -((f.getDay() + 6) % 7)); lab = f.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+                const f = new Date(d.getFullYear(), d.getMonth(), 1), st = addD(f, -((f.getDay() - pf('wsd') + 7) % 7)); lab = f.toLocaleDateString(LOC(), { month: 'long', year: 'numeric' });
                 h = '<div class="mgrid">' + DAYS.map(x => `<div class="mh">${x}</div>`).join('');
                 for (let i = 0; i < 42; i++) {
                     const c = addD(st, i); if (i === 35 && c.getMonth() !== f.getMonth()) break; const en = entries(c);
@@ -1469,11 +1516,11 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
                 h += '</div>'
             }
             else if (CAL.m === 'week') {
-                const st = addD(d, -((d.getDay() + 6) % 7)), w = wkOf(st); lab = `Week of ${st.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}${w >= 1 && w <= S.wks ? ' · Wk ' + w : ''}`;
+                const st = addD(d, -((d.getDay() - pf('wsd') + 7) % 7)), w = wkOf(addD(st, (8 - pf('wsd')) % 7)); lab = `Week of ${st.toLocaleDateString(LOC(), { day: 'numeric', month: 'short' })}${w >= 1 && w <= S.wks ? ' · Wk ' + w : ''}`;
                 h = '<div class="wgrid big">' + [0, 1, 2, 3, 4, 5, 6].map(i => { const c = addD(st, i); return `<div class="wc" data-d="${iso(c)}"><div class="wh">${DN[c.getDay()]} ${c.getDate()}</div>${entries(c).map(e => chip(e, 1)).join('') || '<small class="hint">Free</small>'}</div>` }).join('') + '</div>'
             }
             else {
-                lab = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                lab = d.toLocaleDateString(LOC(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                 h = '<div class="dayc big">' + (entries(d).map(e => chip(e, 1)).join('') || '<p class="hint">Nothing scheduled 🎀</p>') + '</div>'
             }
             $('clab').textContent = lab; $('calbody').innerHTML = h;
@@ -1494,7 +1541,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             $('modlist').innerHTML = [...new Set(items.map(i => code(i.n)).concat(A.map(a => a.m)))].map(m => `<option value="${esc(m)}">`).join('');
             const f = $('afil').value, L = A.filter(a => f === 'all' || (f === 'act' ? a.st !== 'done' : a.st === 'done')).sort((x, y) => (x.d + x.tm).localeCompare(y.d + y.tm)), dn = A.filter(a => a.st === 'done').length;
             $('aprog').innerHTML = A.length ? `<div class="bar"><i style="width:${100 * dn / A.length}%"></i></div><small style="color:var(--mute)">${dn} of ${A.length} completed</small>` : '';
-            $('alist').innerHTML = L.length ? L.map(a => { const l = left(a); return `<div class="arow" data-id="${a.id}"><div class="am"><span class="tag">${esc(a.m)}</span><b class="${a.st === 'done' ? 'dn' : ''}" style="display:inline">${esc(a.t)}</b><small style="display:block">Due ${fmtD(a.d)} ${a.tm || '23:59'}</small></div><span class="pill2 ${l.c}">${l.t}</span><select class="st" aria-label="Status">${ST.map(([v, n]) => `<option value="${v}"${a.st === v ? ' selected' : ''}>${n}</option>`).join('')}</select><button class="del" aria-label="Delete assignment">✕</button></div>` }).join('') : '<p class="hint">Nothing here yet.</p>'
+            $('alist').innerHTML = L.length ? L.map(a => { const l = left(a); return `<div class="arow" data-id="${a.id}"><div class="am"><span class="tag">${esc(a.m)}</span><b class="${a.st === 'done' ? 'dn' : ''}" style="display:inline">${esc(a.t)}</b><small style="display:block">Due ${fmtD(a.d)} ${ft(tm(a.tm || '23:59'))}</small></div><span class="pill2 ${l.c}">${l.t}</span><select class="st" aria-label="Status">${ST.map(([v, n]) => `<option value="${v}"${a.st === v ? ' selected' : ''}>${n}</option>`).join('')}</select><button class="del" aria-label="Delete assignment">✕</button></div>` }).join('') : '<p class="hint">Nothing here yet.</p>'
         }
         $('afil').onchange = renderAsg;
         $('aadd').onclick = () => {
@@ -1521,7 +1568,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             renderFree()
         }
         function renderFree() {
-            const ps = people(), ds = S.wk ? DAYS : DAYS.slice(0, 5), n = ps.length, fw = {}; ds.forEach(d => fw[d] = []);
+            const ps = people(), ds = S.wk ? DAYS : DAYS.filter(d => d !== 'Sat' && d !== 'Sun'), n = ps.length, fw = {}; ds.forEach(d => fw[d] = []);
             let h = `<div class="fg" style="grid-template-columns:44px repeat(${ds.length},1fr)"><div></div>` + ds.map(d => `<div class="fh">${d}</div>`).join('');
             for (let m = 480; m < 1320; m += 30) {
                 h += `<div class="ft">${m % 60 === 0 ? ft(m) : ''}</div>`;
@@ -1546,6 +1593,104 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         $('frlist').onclick = e => { const b = e.target.closest('[data-rm]'); if (b) { FR.splice(+b.dataset.rm, 1); saveF(); renderShare() } };
         $('frlist').onchange = e => { if (e.target.dataset.f != null) { FR[+e.target.dataset.f].on = e.target.checked; saveF(); renderFree() } };
 
+        // ---- profile, settings, notifications ----
+        const PFD = { wsd: 1, h24: true, loc: 'en-GB', sp: 'dash', cv: 'month', lc: true, la: true, lh: true, le: true, nOn: false, n24: true, n3: false, n1: true, nc: 0 };
+        const pf = k => S.pf && S.pf[k] !== undefined ? S.pf[k] : PFD[k];
+        const LOC = () => pf('loc');
+        function setPf(k, v) { S.pf = { ...(S.pf || {}), [k]: v }; saveS() }
+        function applyPrefs() {
+            const i = BASE.indexOf(DN[pf('wsd')]); DAYS = [...BASE.slice(i), ...BASE.slice(0, i)];
+            const cur = $('d').value; $('d').innerHTML = DAYS.map(d => `<option>${d}</option>`).join(''); if (cur) $('d').value = cur;
+            $('v0').innerHTML = ''; $('v1').innerHTML = '';
+            for (let h = 6; h <= 24; h++) { if (h < 24) $('v0').add(new Option(ft(h * 60), h * 60)); if (h > 6) $('v1').add(new Option(ft(h * 60), h * 60)) }
+            $('v0').value = S.v0; $('v1').value = S.v1
+        }
+        const so = (k, o) => `<select data-pf="${k}" aria-label="${k}">${o.map(([v, l]) => `<option value="${v}"${String(pf(k) === true ? '1' : pf(k) === false ? '0' : pf(k)) === String(v) ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+        const sc = (k, l) => `<label class="cl"><input type="checkbox" data-pf="${k}" ${pf(k) ? 'checked' : ''}> ${l}</label>`;
+        const sr = (l, c) => `<div class="srow"><span>${l}</span>${c}</div>`;
+        function renderSettings() {
+            const np = typeof Notification === 'undefined' ? 'not supported in this browser' : Notification.permission;
+            $('v-set').innerHTML = `<div class="cards">
+  <div class="panel"><h2>Time &amp; dates</h2>
+    ${sr('Week starts on', so('wsd', [[1, 'Monday'], [0, 'Sunday'], [6, 'Saturday']]))}
+    ${sr('Time format', so('h24', [['1', '24-hour (14:00)'], ['0', '12-hour (2 PM)']]))}
+    ${sr('Date format', so('loc', [['en-GB', '20 Jan'], ['en-US', 'Jan 20']]))}
+    ${sr('Start page after login', so('sp', [['dash', 'Dashboard'], ['tt', 'Timetable'], ['cal', 'Calendar'], ['asg', 'Assignments']]))}</div>
+  <div class="panel"><h2>Calendar</h2>
+    ${sr('Default view', so('cv', [['month', 'Month'], ['week', 'Week'], ['day', 'Day']]))}
+    <div class="srow" style="align-items:flex-start"><span>Show on calendar</span><div class="cks">${sc('lc', 'Classes')}${sc('la', 'Assignment deadlines')}${sc('lh', 'Public holidays')}${sc('le', 'My events')}</div></div>
+    <p class="hint">Term start date and week count are in Calendar → "Add an event · term dates". Timetable colours stay in the Timetable tab.</p></div>
+  <div class="panel"><h2>Notifications</h2>
+    <div class="srow"><span>Browser reminders</span>${sc('nOn', 'On')}</div>
+    <p class="hint" style="margin-top:0">Permission: <b>${np}</b>. Reminders appear while Hōräe is open in a browser tab (it can be in the background). They don't work when the page is closed.</p>
+    <div class="srow" style="align-items:flex-start"><span>Remind me before a deadline</span><div class="cks">${sc('n24', '1 day before')}${sc('n3', '3 hours before')}${sc('n1', '1 hour before')}</div></div>
+    ${sr('Remind me before a class', so('nc', [[0, 'Off'], [10, '10 minutes'], [15, '15 minutes'], [30, '30 minutes']]))}
+    <div class="btns"><button id="ntest">Send a test reminder</button></div></div>
+  <div class="panel"><h2>Reset</h2><div class="btns" style="margin-top:0"><button id="prst">Reset preferences</button><button id="frclr">Clear friends list</button></div>
+    <p class="hint">Light/dark mode is the button at the top right.</p></div></div>`}
+        $('v-set').onchange = e => {
+            const t = e.target, k = t.dataset.pf; if (!k) return;
+            const v = t.type === 'checkbox' ? t.checked : typeof PFD[k] === 'number' ? +t.value : typeof PFD[k] === 'boolean' ? t.value === '1' : t.value;
+            if (k === 'nOn' && v) {
+                if (typeof Notification === 'undefined') { alert('This browser does not support notifications.'); t.checked = false; return }
+                Notification.requestPermission().then(p => { if (p !== 'granted') { alert('Notifications are blocked. Allow them for this site in your browser settings.'); setPf(k, false) } else setPf(k, true); renderSettings() }); return
+            }
+            setPf(k, v); applyPrefs(); render(); renderSettings()
+        };
+        $('v-set').onclick = e => {
+            const t = e.target.closest('button'); if (!t) return;
+            if (t.id === 'ntest') { if (typeof Notification !== 'undefined' && Notification.permission === 'granted') new Notification('Hōräe ✿', { body: 'Reminders are working.' }); else alert('Turn on browser reminders first and allow notifications.') }
+            if (t.id === 'prst' && confirm('Reset all preferences to defaults?')) { S.pf = {}; saveS(); applyPrefs(); render(); renderSettings() }
+            if (t.id === 'frclr' && confirm('Remove all friends from your compare list?')) { FR = []; saveF(); alert('Friends list cleared.') }
+        };
+        let NT = {}; try { NT = JSON.parse(localStorage.getItem('tt-nt') || '{}') } catch (_) { }
+        function fire(key, t, b) { if (NT[key]) return; NT[key] = Date.now(); try { localStorage.setItem('tt-nt', JSON.stringify(NT)) } catch (_) { } try { new Notification(t, { body: b }) } catch (_) { } }
+        function checkNotes() {
+            if (RO || !user || !pf('nOn') || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+            const now = new Date(), W = [['n1', 36e5], ['n3', 108e5], ['n24', 864e5]].filter(w => pf(w[0]));
+            A.filter(a => a.st !== 'done').forEach(a => {
+                const ms = new Date(a.d + 'T' + (a.tm || '23:59')) - now; if (ms <= 0) return; const hit = W.find(w => ms <= w[1]); if (!hit) return;
+                W.filter(w => w[1] > hit[1]).forEach(w => { NT[a.id + w[0]] = NT[a.id + w[0]] || 1 }); const l = left(a); fire(a.id + hit[0], 'Deadline: ' + a.m, `${a.t} · ${l.t}`)
+            });
+            const n = pf('nc'); if (n) { const nm = now.getHours() * 60 + now.getMinutes(); classesOn(now).forEach(c => { const d = c.s - nm; if (d >= 0 && d <= n) fire(iso(now) + c.id, c.n, `Starts at ${ft(c.s)}${c.o ? ' · ' + c.o : ''}`) }) }
+            Object.keys(NT).forEach(k => { if (now - NT[k] > 2592e6) delete NT[k] })
+        }
+        setInterval(checkNotes, 60000);
+
+        function saveBlob(b, name) {
+            (async () => {
+                let d = null; try { d = window.claude && await window.claude.use('downloads') } catch (_) { }
+                if (d) { try { await d.save({ filename: name, data: b }) } catch (_) { } } else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click() }
+            })()
+        }
+        function renderProfile() {
+            const mods = {}; items.forEach(i => { const c = code(i.n); const m = mods[c] = mods[c] || { n: 0, p: 0, i }; m.n++; if (i.p) m.p++ });
+            A.forEach(a => { mods[a.m] = mods[a.m] || { n: 0, p: 0, i: { n: a.m } } });
+            const dn = A.filter(a => a.st === 'done').length, pl = items.filter(i => i.p).length, ks = Object.keys(mods).sort();
+            const f = (l, k, ph) => `<label>${l}</label><input data-ps="${k}" value="${esc(k === 'name' ? (S.name || defName()) : (S[k] || ''))}" placeholder="${ph || ''}" maxlength="60">`;
+            $('v-prof').innerHTML = `<div class="cards">
+  <div class="panel"><h2>Personal info</h2><label>Email</label><input value="${esc(user ? user.email : '')}" readonly>
+    ${f('Display name', 'name')}${f('Programme / major', 'prog', 'e.g. BSc Computer Science')}${f('University', 'uni')}${f('Year / intake', 'yr', 'e.g. Year 2')}
+    <p class="hint">Member since ${user && user.created_at ? new Date(user.created_at).toLocaleDateString(LOC(), { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}. Changes save automatically.</p>
+    <div class="btns"><button id="pwb">Change password</button><button id="exb">Export my data</button></div></div>
+  <div class="panel"><h2>My Hōräe</h2><div class="pgrid"><div class="pc"><b>${pl}</b>classes on timetable</div><div class="pc"><b>${ks.length}</b>modules</div><div class="pc"><b>${dn}/${A.length}</b>assignments done</div><div class="pc"><b>${EV.length}</b>events</div><div class="pc"><b>${SN.length + 1}</b>saved timetables</div><div class="pc"><b>${FR.length}</b>friends</div></div></div>
+  <div class="panel"><h2>Modules</h2>${ks.map(c => { const m = mods[c], as = A.filter(a => a.m === c), ac = as.filter(a => a.st !== 'done').length; return li(bd(m.i), c, `${m.p}/${m.n} classes placed · ${ac} active assignment${ac === 1 ? '' : 's'}`) }).join('') || '<p class="hint">No modules yet.</p>'}</div>
+  <div class="panel"><h2>Saved timetables</h2>
+    ${li('var(--acc)', S.title || 'My timetable', `Current · ${pl} classes · from ${fmtD(S.t0)}`)}
+    ${SN.map(x => li('#c7a6ff', x.name, `Saved ${new Date(x.at).toLocaleDateString(LOC(), { day: 'numeric', month: 'short' })} · ${x.items.filter(i => i.p).length} classes`, `<button data-snload="${x.id}">Load</button><button class="del" data-sndel="${x.id}" aria-label="Delete saved timetable">✕</button>`)).join('')}
+    <label for="snname">Save the current timetable as…</label><div class="crow"><input id="snname" placeholder="e.g. Trimester 2 · Plan B"><button class="pri" id="snsave">Save</button></div>
+    <p class="hint">Handy for trying different plans before you register.</p></div></div>`}
+        $('v-prof').oninput = e => { const k = e.target.dataset.ps; if (!k) return; S[k] = e.target.value; saveS() };
+        $('v-prof').onclick = e => {
+            const t = e.target.closest('button'); if (!t) return;
+            if (t.id === 'snsave') { SN.push({ id: nodeUid(), name: $('snname').value.trim() || S.title || 'Timetable', at: new Date().toISOString(), items: JSON.parse(JSON.stringify(items)), title: S.title, t0: S.t0, wks: S.wks }); saveP(); renderProfile() }
+            else if (t.dataset.snload) { const x = SN.find(y => y.id === t.dataset.snload); if (x && confirm(`Replace your current timetable with "${x.name}"? Save the current one first if you want to keep it.`)) { items = JSON.parse(JSON.stringify(x.items)); S.title = x.title || S.title; S.t0 = x.t0 || S.t0; S.wks = x.wks || S.wks; $('ttname').value = S.title; save(); saveS(); render(); renderProfile() } }
+            else if (t.dataset.sndel) { SN = SN.filter(y => y.id !== t.dataset.sndel); saveP(); renderProfile() }
+            else if (t.id === 'pwb') { const pw = prompt('New password (6+ characters):'); if (pw && sb) sb.auth.updateUser({ password: pw }).then(r => alert(r.error ? r.error.message : 'Password updated.')) }
+            else if (t.id === 'exb') { saveBlob(new Blob([JSON.stringify({ exported: new Date().toISOString(), profile: { email: user && user.email, name: S.name, programme: S.prog, university: S.uni, year: S.yr }, timetable: { title: S.title, termStart: S.t0, weeks: S.wks, classes: items.filter(i => i.p) }, assignments: A, events: EV, savedTimetables: SN, preferences: S.pf || {} }, null, 2)], { type: 'application/json' }), 'horae-data.json') }
+        };
+        applyPrefs();
+
         // view-only mode for shared links
         if (/#s=/.test(location.hash)) {
             const sh = parseLink(location.hash); if (sh) {
@@ -1563,12 +1708,12 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
 
         try { sb = window.supabase.createClient(SB_URL, SB_KEY) } catch (_) { }
         const amsg = (t, ok) => { $('am').textContent = t || ''; $('am').className = ok ? 'info' : '' };
-        function applyUI() { setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Hōräe'; theme() }
+        function applyUI() { applyPrefs(); CAL.m = pf('cv'); setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Hōräe'; theme() }
         function push() {
             if (!sb || !user || !cloudReady) return;
             $('sync').textContent = 'Saving…'; clearTimeout(timer);
             timer = setTimeout(async () => {
-                const { error } = await sb.from('timetables').upsert({ user_id: user.id, data: { items, S, a: A, e: EV }, updated_at: new Date().toISOString() });
+                const { error } = await sb.from('timetables').upsert({ user_id: user.id, data: { items, S, a: A, e: EV, sn: SN }, updated_at: new Date().toISOString() });
                 $('sync').textContent = error ? 'Not saved' : 'Saved to your account'; $('sync').title = error ? error.message : ''
             }, 700);
         }
@@ -1577,8 +1722,8 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             const { data, error } = await sb.from('timetables').select('data').eq('user_id', user.id).maybeSingle();
             if (error) { $('sync').textContent = 'Could not load: ' + error.message; return }
             quiet = true;
-            if (data && data.data) { items = data.data.items || []; S = { ...DEF, ...(data.data.S || {}) }; A = data.data.a || []; EV = data.data.e || [] }
-            applyUI(); render(); quiet = false; cloudReady = true; go('dash');
+            if (data && data.data) { items = data.data.items || []; S = { ...DEF, ...(data.data.S || {}) }; A = data.data.a || []; EV = data.data.e || []; SN = data.data.sn || [] }
+            applyUI(); render(); quiet = false; cloudReady = true; go(pf('sp'));
             if (!data) push(); else $('sync').textContent = 'Saved to your account';
         }
         function handle(sess) {
@@ -1588,7 +1733,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
                 if (loadedFor !== user.id) { loadedFor = user.id; loadCloud() }
             }
             else {
-                if (loadedFor) { quiet = true; items = mk(); S = { ...DEF }; A = []; EV = []; FR = []; try { localStorage.removeItem('tt-pl'); localStorage.removeItem('tt-fr'); localStorage.removeItem('tt-v1'); localStorage.removeItem('tt-set'); localStorage.removeItem('tt-ts') } catch (_) { } applyUI(); render(); quiet = false }
+                if (loadedFor) { quiet = true; items = mk(); S = { ...DEF }; A = []; EV = []; FR = []; SN = []; try { localStorage.removeItem('tt-pl'); localStorage.removeItem('tt-fr'); localStorage.removeItem('tt-v1'); localStorage.removeItem('tt-set'); localStorage.removeItem('tt-ts') } catch (_) { } applyUI(); render(); quiet = false }
                 user = null; loadedFor = null; cloudReady = false; document.body.classList.add('locked');
             }
         }
