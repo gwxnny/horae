@@ -710,13 +710,14 @@
         </div>
     </main>
     <script>
+        let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in';
         const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], T0 = 360, T1 = 1440, PX = .8;
-        let DEF = {wk: false, v0: 480, v1: 1380, theme: null, title: 'Trimester 2 timetable', ws: '1179x2556'};
-        let S = {...DEF}, V0 = 480, V1 = 1380, VD = DAYS, LN = {}, CLS = new Set(), sel = new Set(), ccol = null, cchg = false;
-        try {Object.assign(S, JSON.parse(localStorage.getItem('tt-set') || '{}'))} catch (_) { }
-        const saveS = () => {try {localStorage.setItem('tt-set', JSON.stringify(S))} catch (_) { } stamp()};
-        const tm = s => {const [a, b] = s.split(':'); return +a * 60 + +b}, ft = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
-        const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+        let DEF = { wk: false, v0: 480, v1: 1380, theme: null, title: 'Trimester 2 timetable', ws: '1179x2556' };
+        let S = { ...DEF }, V0 = 480, V1 = 1380, VD = DAYS, LN = {}, CLS = new Set(), sel = new Set(), ccol = null, cchg = false;
+        try { Object.assign(S, JSON.parse(localStorage.getItem('tt-set') || '{}')) } catch (_) { }
+        const saveS = () => { try { localStorage.setItem('tt-set', JSON.stringify(S)) } catch (_) { } stamp() };
+        const tm = s => { const [a, b] = s.split(':'); return +a * 60 + +b }, ft = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const SEED = `CSD1171 - Q1|Tue|10:00|12:00|Wk14 · E2-08-02
 CSD1171 - L2|Wed|09:00|11:00|Lectorial 9 · Wk1-6,8-13
 CSD1171 - L1|Wed|11:00|13:00|Lectorial 9 · Wk1-6,8-13
@@ -735,31 +736,31 @@ CSD1451 - PRJ2|Wed|11:00|13:00|W1-06-04-SR02 · Wk5
 CSD4902A - W1|Wed|14:00|16:00|Online · Wk3
 CSD1130 - L1|Fri|14:00|16:00|W5-02-01 Lectorial 2 · Wk1-6,8-13
 CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
-        const mk = () => SEED.split('\n').map((l, i) => {const [n, d, s, e, o] = l.split('|'); return {id: 's' + i, n, d, s: tm(s), e: tm(e), o, p: false}});
+        const mk = () => SEED.split('\n').map((l, i) => { const [n, d, s, e, o] = l.split('|'); return { id: 's' + i, n, d, s: tm(s), e: tm(e), o, p: false } });
         let items = [], editing = null;
-        try {items = JSON.parse(localStorage.getItem('tt-v1') || 'null') || mk()} catch (_) {items = mk()}
+        try { items = JSON.parse(localStorage.getItem('tt-v1') || 'null') || mk() } catch (_) { items = mk() }
         let TS = 0, cloud = null, quiet = false, timer = null, who = '';
-        try {TS = +localStorage.getItem('tt-ts') || 0} catch (_) { }
-        const stamp = () => {if (quiet) return; TS = Date.now(); try {localStorage.setItem('tt-ts', TS)} catch (_) { } push()};
-        const save = () => {try {localStorage.setItem('tt-v1', JSON.stringify(items))} catch (_) { } stamp()};
+        try { TS = +localStorage.getItem('tt-ts') || 0 } catch (_) { }
+        const stamp = () => { if (quiet) return; TS = Date.now(); try { localStorage.setItem('tt-ts', TS) } catch (_) { } push() };
+        const save = () => { try { localStorage.setItem('tt-v1', JSON.stringify(items)) } catch (_) { } stamp() };
         const $ = id => document.getElementById(id);
         $('d').innerHTML = DAYS.map(d => `<option>${d}</option>`).join('');
         const code = n => n.split(' ')[0];
-        const hue = n => {let h = 0; for (const c of code(n)) h = (h * 31 + c.charCodeAt(0)) % 360; return h};
-        const dk = h => {const n = parseInt(h.slice(1), 16); return `rgb(${(n >> 16) * .6 | 0},${(n >> 8 & 255) * .6 | 0},${(n & 255) * .6 | 0})`};
+        const hue = n => { let h = 0; for (const c of code(n)) h = (h * 31 + c.charCodeAt(0)) % 360; return h };
+        const dk = h => { const n = parseInt(h.slice(1), 16); return `rgb(${(n >> 16) * .6 | 0},${(n >> 8 & 255) * .6 | 0},${(n & 255) * .6 | 0})` };
         const bg = i => i.c || `hsl(${hue(i.n)} 70% 84%)`, bd = i => i.c ? dk(i.c) : `hsl(${hue(i.n)} 70% 42%)`;
-        const fg = i => {if (!i.c) return '#14202b'; const n = parseInt(i.c.slice(1), 16); return (.299 * (n >> 16) + .587 * (n >> 8 & 255) + .114 * (n & 255)) > 150 ? '#14202b' : '#fff'};
+        const fg = i => { if (!i.c) return '#14202b'; const n = parseInt(i.c.slice(1), 16); return (.299 * (n >> 16) + .587 * (n >> 8 & 255) + .114 * (n & 255)) > 150 ? '#14202b' : '#fff' };
         const ov = (a, b) => a.d === b.d && a.s < b.e && b.s < a.e;
 
         function render() {
             VD = S.wk ? DAYS : DAYS.slice(0, 5); V0 = S.v0; V1 = S.v1;
             const pl = items.filter(i => i.p), clash = new Set(), pairs = [];
-            pl.forEach((a, i) => pl.slice(i + 1).forEach(b => {if (ov(a, b)) {clash.add(a.id); clash.add(b.id); pairs.push([a, b])} }));
+            pl.forEach((a, i) => pl.slice(i + 1).forEach(b => { if (ov(a, b)) { clash.add(a.id); clash.add(b.id); pairs.push([a, b]) } }));
             const lane = {};
             DAYS.forEach(d => {
                 const L = pl.filter(i => i.d === d).sort((a, b) => a.s - b.s || a.e - b.e); let cl = [], end = 0;
-                const flush = () => {const n = Math.max(1, ...cl.map(x => lane[x.id].l + 1)); cl.forEach(x => lane[x.id].n = n); cl = []};
-                L.forEach(x => {if (cl.length && x.s >= end) flush(); const used = cl.filter(y => y.e > x.s).map(y => lane[y.id].l); let l = 0; while (used.includes(l)) l++; lane[x.id] = {l, n: 1}; cl.push(x); end = cl.length === 1 ? x.e : Math.max(end, x.e)}); flush()
+                const flush = () => { const n = Math.max(1, ...cl.map(x => lane[x.id].l + 1)); cl.forEach(x => lane[x.id].n = n); cl = [] };
+                L.forEach(x => { if (cl.length && x.s >= end) flush(); const used = cl.filter(y => y.e > x.s).map(y => lane[y.id].l); let l = 0; while (used.includes(l)) l++; lane[x.id] = { l, n: 1 }; cl.push(x); end = cl.length === 1 ? x.e : Math.max(end, x.e) }); flush()
             });
             LN = lane; CLS = clash;
             let h = '<div class="dh" style="border-left:0"></div>' + VD.map(d => `<div class="dh">${d}</div>`).join('');
@@ -767,7 +768,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             h += `<div class="times">${t}</div>`;
             VD.forEach(d => {
                 h += `<div class="col" data-d="${d}" style="overflow:hidden">` + pl.filter(i => i.d === d && i.e > V0 && i.s < V1).map(i => {
-                    const {l, n} = lane[i.id]; const w = 100 / n;
+                    const { l, n } = lane[i.id]; const w = 100 / n;
                     return `<div class="blk${clash.has(i.id) ? ' clash' : ''}" data-id="${i.id}" style="top:${(i.s - V0) * PX}px;height:${(i.e - i.s) * PX - 1}px;left:calc(${l * w}% + 2px);width:calc(${w}% - 4px);background:${bg(i)};border-color:${bd(i)};color:${fg(i)}"><button class="x" aria-label="Remove ${esc(i.n)}" title="Back to bank">×</button><b>${esc(i.n)}</b><small>${ft(i.s)}–${ft(i.e)}</small>${i.o ? `<small style="display:block">${esc(i.o)}</small>` : ''}</div>`
                 }).join('') + '</div>'
             });
@@ -780,7 +781,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             $('bank').innerHTML = bk.length ? Object.keys(gr).sort().map(k => `<div class="grp">${esc(k)}</div>` + gr[k].map(i => `<div class="chip" data-id="${i.id}" style="border-left-color:${bd(i)}"><input type="checkbox" class="sel" aria-label="Select ${esc(i.n)}" ${sel.has(i.id) ? 'checked' : ''}><div><b>${esc(i.n)}</b><small>${i.d} ${ft(i.s)}–${ft(i.e)}${i.o ? ' · ' + esc(i.o) : ''}</small></div><button title="Place at its usual time">Place</button></div>`).join('')).join('') : '<p class="hint">Every class is on your timetable.</p>';
             updSel(); save();
         }
-        function updSel() {const n = sel.size, b = items.filter(i => !i.p).length; $('delsel').disabled = !n; $('delsel').textContent = n ? `Delete selected (${n})` : 'Delete selected'; $('selall').checked = b > 0 && n === b}
+        function updSel() { const n = sel.size, b = items.filter(i => !i.p).length; $('delsel').disabled = !n; $('delsel').textContent = n ? `Delete selected (${n})` : 'Delete selected'; $('selall').checked = b > 0 && n === b }
 
         // drag and drop (pointer events: mouse and touch)
         let drag = null;
@@ -789,39 +790,39 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             const it = items.find(x => x.id === el.dataset.id), bank = el.classList.contains('chip');
             if (e.target.closest('input')) return;
             if (e.target.closest('button')) {
-                if (bank) {it.p = true; render()} else if (e.target.closest('.x')) {it.p = false; render()} return
+                if (bank) { it.p = true; render() } else if (e.target.closest('.x')) { it.p = false; render() } return
             }
-            drag = {it, bank, x0: e.clientX, y0: e.clientY, off: bank ? 0 : e.clientY - el.getBoundingClientRect().top, moved: false, g: null, tgt: null};
+            drag = { it, bank, x0: e.clientX, y0: e.clientY, off: bank ? 0 : e.clientY - el.getBoundingClientRect().top, moved: false, g: null, tgt: null };
             e.preventDefault();
         });
         function target(e) {
             const c = document.elementFromPoint(e.clientX, e.clientY)?.closest('.col');
-            if (!c) {return null}
+            if (!c) { return null }
             const r = c.getBoundingClientRect(), dur = drag.it.e - drag.it.s;
             let s = Math.round(((e.clientY - drag.off - r.top) / PX) / 30) * 30 + V0;
             s = Math.max(V0, Math.min(V1 - dur, s));
-            return {c, d: c.dataset.d, s, e: s + dur};
+            return { c, d: c.dataset.d, s, e: s + dur };
         }
         document.addEventListener('pointermove', e => {
             if (!drag) return;
             if (!drag.moved && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 5) return;
             drag.moved = true;
-            if (!drag.g) {drag.g = document.createElement('div'); drag.g.className = 'ghost'; drag.g.textContent = drag.it.n; document.body.appendChild(drag.g)}
+            if (!drag.g) { drag.g = document.createElement('div'); drag.g.className = 'ghost'; drag.g.textContent = drag.it.n; document.body.appendChild(drag.g) }
             drag.g.style.left = e.clientX + 10 + 'px'; drag.g.style.top = e.clientY + 6 + 'px';
             document.querySelectorAll('.drop').forEach(x => x.remove());
             const t = drag.tgt = target(e); if (!t) return;
-            const bad = items.some(o => o.p && o.id !== drag.it.id && ov({d: t.d, s: t.s, e: t.e}, o));
+            const bad = items.some(o => o.p && o.id !== drag.it.id && ov({ d: t.d, s: t.s, e: t.e }, o));
             const p = document.createElement('div'); p.className = 'drop' + (bad ? ' bad' : '');
             p.style.top = (t.s - V0) * PX + 'px'; p.style.height = (t.e - t.s) * PX + 'px'; t.c.appendChild(p);
         });
         document.addEventListener('pointerup', e => {
             if (!drag) return; const D = drag; drag = null;
             D.g && D.g.remove(); document.querySelectorAll('.drop').forEach(x => x.remove());
-            if (!D.moved) {if (!D.bank) edit(D.it.id); return }
+            if (!D.moved) { if (!D.bank) edit(D.it.id); return }
             const t = D.tgt; if (!t) return;
-            Object.assign(D.it, {d: t.d, s: t.s, e: t.e, p: true}); render();
+            Object.assign(D.it, { d: t.d, s: t.s, e: t.e, p: true }); render();
         });
-        document.addEventListener('pointercancel', () => {if (drag) {drag.g && drag.g.remove(); drag = null; document.querySelectorAll('.drop').forEach(x => x.remove())} });
+        document.addEventListener('pointercancel', () => { if (drag) { drag.g && drag.g.remove(); drag = null; document.querySelectorAll('.drop').forEach(x => x.remove()) } });
 
         // form
         function setForm(it) {
@@ -831,43 +832,43 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             $('ftitle').textContent = it ? 'Edit class' : 'Add a class'; $('save').textContent = it ? 'Save changes' : 'Add to timetable';
             $('del').hidden = $('cancel').hidden = !it; $('msg').textContent = '';
         }
-        function edit(id) {setForm(items.find(x => x.id === id)); $('n').focus()}
-        $('c').oninput = () => {ccol = $('c').value; cchg = true; $('cl').textContent = 'Custom'};
-        $('auto').onclick = () => {ccol = null; cchg = true; $('c').value = '#888888'; $('cl').textContent = 'Auto'};
+        function edit(id) { setForm(items.find(x => x.id === id)); $('n').focus() }
+        $('c').oninput = () => { ccol = $('c').value; cchg = true; $('cl').textContent = 'Custom' };
+        $('auto').onclick = () => { ccol = null; cchg = true; $('c').value = '#888888'; $('cl').textContent = 'Auto' };
         $('save').onclick = () => {
             const n = $('n').value.trim(), s = tm($('s').value || '0:0'), e = tm($('e').value || '0:0');
             if (!n) return $('msg').textContent = 'Give the class a name.';
             if (e <= s) return $('msg').textContent = 'End time must be after start time.';
             if (s < T0 || e > T1) return $('msg').textContent = 'Times must be between 06:00 and 24:00.';
-            const f = {n, d: $('d').value, s, e, o: $('o').value.trim()};
+            const f = { n, d: $('d').value, s, e, o: $('o').value.trim() };
             let it;
-            if (editing) {it = items.find(x => x.id === editing); Object.assign(it, f)} else {it = {id: 'u' + Date.now(), ...f, p: true}; items.push(it)}
-            if (!editing || cchg) {it.c = ccol || undefined; if (cchg && $('call').checked) items.filter(x => code(x.n) === code(n)).forEach(x => x.c = ccol || undefined)}
+            if (editing) { it = items.find(x => x.id === editing); Object.assign(it, f) } else { it = { id: 'u' + Date.now(), ...f, p: true }; items.push(it) }
+            if (!editing || cchg) { it.c = ccol || undefined; if (cchg && $('call').checked) items.filter(x => code(x.n) === code(n)).forEach(x => x.c = ccol || undefined) }
             setForm(null); render();
         };
-        $('del').onclick = () => {items = items.filter(x => x.id !== editing); setForm(null); render()};
+        $('del').onclick = () => { items = items.filter(x => x.id !== editing); setForm(null); render() };
         $('cancel').onclick = () => setForm(null);
-        $('clear').onclick = () => {items.forEach(i => i.p = false); render()};
-        $('reset').onclick = () => {const u = items.filter(i => i.id[0] === 'u'); items = [...mk(), ...u]; sel.clear(); render()};
+        $('clear').onclick = () => { items.forEach(i => i.p = false); render() };
+        $('reset').onclick = () => { const u = items.filter(i => i.id[0] === 'u'); items = [...mk(), ...u]; sel.clear(); render() };
 
         // bank multi-select
         document.addEventListener('change', e => {
-            if (e.target.classList.contains('sel')) {const id = e.target.closest('.chip').dataset.id; e.target.checked ? sel.add(id) : sel.delete(id); updSel()}
+            if (e.target.classList.contains('sel')) { const id = e.target.closest('.chip').dataset.id; e.target.checked ? sel.add(id) : sel.delete(id); updSel() }
         });
-        $('selall').onchange = e => {sel = e.target.checked ? new Set(items.filter(i => !i.p).map(i => i.id)) : new Set(); render()};
-        $('delsel').onclick = () => {if (!sel.size || !confirm(`Delete ${sel.size} class${sel.size > 1 ? 'es' : ''} from the bank? This can't be undone (except by reloading the T2 list).`)) return; items = items.filter(i => !sel.has(i.id)); sel.clear(); render()};
+        $('selall').onchange = e => { sel = e.target.checked ? new Set(items.filter(i => !i.p).map(i => i.id)) : new Set(); render() };
+        $('delsel').onclick = () => { if (!sel.size || !confirm(`Delete ${sel.size} class${sel.size > 1 ? 'es' : ''} from the bank? This can't be undone (except by reloading the T2 list).`)) return; items = items.filter(i => !sel.has(i.id)); sel.clear(); render() };
 
         // view settings + theme
-        for (let h = 6; h <= 24; h++) {if (h < 24) $('v0').add(new Option(ft(h * 60), h * 60)); if (h > 6) $('v1').add(new Option(ft(h * 60), h * 60))}
+        for (let h = 6; h <= 24; h++) { if (h < 24) $('v0').add(new Option(ft(h * 60), h * 60)); if (h > 6) $('v1').add(new Option(ft(h * 60), h * 60)) }
         $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1;
-        $('wk').onchange = e => {S.wk = e.target.checked; saveS(); render()};
-        $('v0').onchange = $('v1').onchange = () => {let a = +$('v0').value, b = +$('v1').value; if (b <= a) {b = Math.min(1440, a + 60); if (b <= a) {a = b - 60} } S.v0 = a; S.v1 = b; $('v0').value = a; $('v1').value = b; saveS(); render()};
-        function theme() {const t = S.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = t; $('theme').textContent = t === 'dark' ? '☀ Light mode' : '☾ Dark mode'}
-        $('theme').onclick = () => {S.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; saveS(); theme()};
+        $('wk').onchange = e => { S.wk = e.target.checked; saveS(); render() };
+        $('v0').onchange = $('v1').onchange = () => { let a = +$('v0').value, b = +$('v1').value; if (b <= a) { b = Math.min(1440, a + 60); if (b <= a) { a = b - 60 } } S.v0 = a; S.v1 = b; $('v0').value = a; $('v1').value = b; saveS(); render() };
+        function theme() { const t = S.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = t; $('theme').textContent = t === 'dark' ? '☀ Light mode' : '☾ Dark mode' }
+        $('theme').onclick = () => { S.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; saveS(); theme() };
 
         // exports
         const slug = () => (S.title || 'timetable').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'timetable';
-        function wrap(x, t, w) {const out = []; let l = ''; for (const wd of t.split(' ')) {const tt = l ? l + ' ' + wd : wd; if (x.measureText(tt).width > w && l) {out.push(l); l = wd} else l = tt} out.push(l); return out}
+        function wrap(x, t, w) { const out = []; let l = ''; for (const wd of t.split(' ')) { const tt = l ? l + ' ' + wd : wd; if (x.measureText(tt).width > w && l) { out.push(l); l = wd } else l = tt } out.push(l); return out }
         const FNT = '"Instrument Sans",system-ui,sans-serif';
         const cv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
         function paint(x, ox, oy, W, H, k, notes) {
@@ -875,32 +876,32 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             x.save(); x.translate(ox, oy); x.beginPath(); x.roundRect ? x.roundRect(0, 0, W, H, 10 * k) : x.rect(0, 0, W, H); x.clip();
             x.fillStyle = cv('--panel'); x.fillRect(0, 0, W, H); x.fillStyle = cv('--bg'); x.fillRect(0, 0, W, Hd);
             x.strokeStyle = cv('--line'); x.lineWidth = k > 1 ? 2 : 1; x.textBaseline = 'middle';
-            for (let m = V0; m <= V1; m += 60) {const y = Hd + (m - V0) * ppm; x.beginPath(); x.moveTo(L, y); x.lineTo(W, y); x.stroke()}
+            for (let m = V0; m <= V1; m += 60) { const y = Hd + (m - V0) * ppm; x.beginPath(); x.moveTo(L, y); x.lineTo(W, y); x.stroke() }
             x.fillStyle = cv('--mute'); x.font = `${11 * k}px ${FNT}`; x.textAlign = 'right';
             for (let m = V0; m <= V1; m += 60)x.fillText(ft(m), L - 6 * k, Hd + (m - V0) * ppm + (m === V0 ? 7 * k : 0));
             x.font = `600 ${13 * k}px ${FNT}`; x.textAlign = 'center';
-            VD.forEach((d, j) => {x.beginPath(); x.moveTo(L + j * cw, 0); x.lineTo(L + j * cw, H); x.stroke(); x.fillStyle = cv('--ink'); x.fillText(d, L + j * cw + cw / 2, Hd / 2)});
+            VD.forEach((d, j) => { x.beginPath(); x.moveTo(L + j * cw, 0); x.lineTo(L + j * cw, H); x.stroke(); x.fillStyle = cv('--ink'); x.fillText(d, L + j * cw + cw / 2, Hd / 2) });
             x.textAlign = 'left'; x.textBaseline = 'top';
             items.filter(i => i.p && i.e > V0 && i.s < V1 && VD.includes(i.d)).forEach(i => {
-                const j = VD.indexOf(i.d), {l, n} = LN[i.id], w = (cw - 4 * k) / n, bx = L + j * cw + 2 * k + l * w, by = Hd + (i.s - V0) * ppm, bh = (i.e - i.s) * ppm - k;
+                const j = VD.indexOf(i.d), { l, n } = LN[i.id], w = (cw - 4 * k) / n, bx = L + j * cw + 2 * k + l * w, by = Hd + (i.s - V0) * ppm, bh = (i.e - i.s) * ppm - k;
                 x.save(); x.beginPath(); x.rect(bx, by, w - 2 * k, bh); x.clip();
                 x.fillStyle = bg(i); x.fillRect(bx, by, w - 2 * k, bh); x.fillStyle = bd(i); x.fillRect(bx, by, 4 * k, bh);
                 x.fillStyle = fg(i); let y = by + 4 * k;
-                x.font = `700 ${12 * k}px ${FNT}`; wrap(x, i.n, w - 14 * k).forEach(t => {x.fillText(t, bx + 8 * k, y); y += 15 * k});
-                x.font = `${11 * k}px ${FNT}`;[ft(i.s) + '–' + ft(i.e), notes ? i.o || '' : ''].filter(Boolean).forEach(t => wrap(x, t, w - 14 * k).forEach(u => {x.fillText(u, bx + 8 * k, y); y += 14 * k}));
+                x.font = `700 ${12 * k}px ${FNT}`; wrap(x, i.n, w - 14 * k).forEach(t => { x.fillText(t, bx + 8 * k, y); y += 15 * k });
+                x.font = `${11 * k}px ${FNT}`;[ft(i.s) + '–' + ft(i.e), notes ? i.o || '' : ''].filter(Boolean).forEach(t => wrap(x, t, w - 14 * k).forEach(u => { x.fillText(u, bx + 8 * k, y); y += 14 * k }));
                 x.restore();
-                if (CLS.has(i.id)) {x.strokeStyle = cv('--bad'); x.lineWidth = 2 * k; x.strokeRect(bx + k, by + k, w - 4 * k, bh - 2 * k)}
+                if (CLS.has(i.id)) { x.strokeStyle = cv('--bad'); x.lineWidth = 2 * k; x.strokeRect(bx + k, by + k, w - 4 * k, bh - 2 * k) }
             });
             x.restore();
         }
         function out(c, name) {
             c.toBlob(async b => {
-                let d = null; try {d = window.claude && await window.claude.use('downloads')} catch (_) { }
-                if (d) {try {await d.save({filename: name, data: b})} catch (_) { } }
-                else {const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click()}
+                let d = null; try { d = window.claude && await window.claude.use('downloads') } catch (_) { }
+                if (d) { try { await d.save({ filename: name, data: b }) } catch (_) { } }
+                else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click() }
             })
         }
-        function fit(x, t, max, fs) {do {x.font = `700 ${fs}px ${FNT}`; fs -= 2} while (x.measureText(t).width > max && fs > 14)}
+        function fit(x, t, max, fs) { do { x.font = `700 ${fs}px ${FNT}`; fs -= 2 } while (x.measureText(t).width > max && fs > 14) }
         $('png').onclick = () => {
             const pad = 16, sc = 2, W = 56 + 170 * VD.length, GH = 34 + (V1 - V0) * PX, TH = 46, c = document.createElement('canvas');
             c.width = (W + 2 * pad) * sc; c.height = (GH + TH + pad) * sc; const x = c.getContext('2d'); x.scale(sc, sc);
@@ -917,40 +918,40 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             paint(x, m, Hp * .34, Wp - 2 * m, Hp * .58, k, false); out(c, slug() + '-wallpaper.png');
         };
         $('ttname').value = S.title; document.title = S.title || 'Hōräe';
-        $('ttname').oninput = e => {S.title = e.target.value; document.title = S.title || 'Hōräe'; saveS()};
-        $('wsize').value = S.ws; $('wsize').onchange = e => {S.ws = e.target.value; saveS()};
+        $('ttname').oninput = e => { S.title = e.target.value; document.title = S.title || 'Hōräe'; saveS() };
+        $('wsize').value = S.ws; $('wsize').onchange = e => { S.ws = e.target.value; saveS() };
         theme(); render();
 
         // ---- accounts & cloud sync (Supabase) ----
         const SB_URL = 'https://nhydoheogyfoffgbxrmv.supabase.co', SB_KEY = 'sb_publishable_sJDZS5qfxO1ARumZTHYemA_NfKDYpGI';
-        let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in';
-        try {sb = window.supabase.createClient(SB_URL, SB_KEY)} catch (_) { }
-        const amsg = (t, ok) => {$('am').textContent = t || ''; $('am').className = ok ? 'info' : ''};
-        function applyUI() {setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Hōräe'; theme()}
+
+        try { sb = window.supabase.createClient(SB_URL, SB_KEY) } catch (_) { }
+        const amsg = (t, ok) => { $('am').textContent = t || ''; $('am').className = ok ? 'info' : '' };
+        function applyUI() { setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Hōräe'; theme() }
         function push() {
             if (!sb || !user || !cloudReady) return;
             $('sync').textContent = 'Saving…'; clearTimeout(timer);
             timer = setTimeout(async () => {
-                const {error} = await sb.from('timetables').upsert({user_id: user.id, data: {items, S}, updated_at: new Date().toISOString()});
+                const { error } = await sb.from('timetables').upsert({ user_id: user.id, data: { items, S }, updated_at: new Date().toISOString() });
                 $('sync').textContent = error ? 'Not saved' : 'Saved to your account'; $('sync').title = error ? error.message : ''
             }, 700);
         }
         async function loadCloud() {
             cloudReady = false; $('sync').textContent = 'Loading…';
-            const {data, error} = await sb.from('timetables').select('data').eq('user_id', user.id).maybeSingle();
-            if (error) {$('sync').textContent = 'Could not load: ' + error.message; return }
+            const { data, error } = await sb.from('timetables').select('data').eq('user_id', user.id).maybeSingle();
+            if (error) { $('sync').textContent = 'Could not load: ' + error.message; return }
             quiet = true;
-            if (data && data.data) {items = data.data.items || []; S = {...DEF, ...(data.data.S || {})}}
+            if (data && data.data) { items = data.data.items || []; S = { ...DEF, ...(data.data.S || {}) } }
             applyUI(); render(); quiet = false; cloudReady = true;
             if (!data) push(); else $('sync').textContent = 'Saved to your account';
         }
         function handle(sess) {
             if (sess) {
                 user = sess.user; document.body.classList.remove('locked'); $('who').textContent = user.email;
-                if (loadedFor !== user.id) {loadedFor = user.id; loadCloud()}
+                if (loadedFor !== user.id) { loadedFor = user.id; loadCloud() }
             }
             else {
-                if (loadedFor) {quiet = true; items = mk(); S = {...DEF}; try {localStorage.removeItem('tt-v1'); localStorage.removeItem('tt-set'); localStorage.removeItem('tt-ts')} catch (_) { } applyUI(); render(); quiet = false}
+                if (loadedFor) { quiet = true; items = mk(); S = { ...DEF }; try { localStorage.removeItem('tt-v1'); localStorage.removeItem('tt-set'); localStorage.removeItem('tt-ts') } catch (_) { } applyUI(); render(); quiet = false }
                 user = null; loadedFor = null; cloudReady = false; document.body.classList.add('locked');
             }
         }
@@ -963,24 +964,24 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             e.preventDefault(); if (!sb) return amsg("Couldn't load the sign-in service. Check your connection and reload.");
             const email = $('ae').value.trim(), password = $('ap').value; amsg('Working…', true); $('asub').disabled = true;
             try {
-                if (mode === 'in') {const {error} = await sb.auth.signInWithPassword({email, password}); amsg(error ? error.message : '')}
+                if (mode === 'in') { const { error } = await sb.auth.signInWithPassword({ email, password }); amsg(error ? error.message : '') }
                 else {
-                    const {data, error} = await sb.auth.signUp({email, password});
-                    if (error) amsg(error.message); else if (!data.session) {amsg('Check your email to confirm your account, then log in.', true); setMode('in')} else amsg('')
+                    const { data, error } = await sb.auth.signUp({ email, password });
+                    if (error) amsg(error.message); else if (!data.session) { setMode('in'); amsg('Check your email to confirm your account, then log in.', true) } else amsg('')
                 }
-            } catch (err) {amsg('Something went wrong. Try again.')}
+            } catch (err) { amsg('Something went wrong. Try again.') }
             $('asub').disabled = false;
         };
         $('aforgot').onclick = async () => {
             const email = $('ae').value.trim(); if (!email) return amsg('Enter your email first.'); if (!sb) return;
-            const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: location.href.split('#')[0]});
+            const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('#')[0] });
             amsg(error ? error.message : 'Password reset link sent. Check your email.', !error);
         };
         $('logout').onclick = () => sb && sb.auth.signOut();
         if (sb) {
             sb.auth.onAuthStateChange((ev, sess) => {
                 setTimeout(async () => {
-                    if (ev === 'PASSWORD_RECOVERY') {const pw = prompt('Enter your new password (6+ characters):'); if (pw) {const {error} = await sb.auth.updateUser({password: pw}); alert(error ? error.message : 'Password updated.')} }
+                    if (ev === 'PASSWORD_RECOVERY') { const pw = prompt('Enter your new password (6+ characters):'); if (pw) { const { error } = await sb.auth.updateUser({ password: pw }); alert(error ? error.message : 'Password updated.') } }
                     handle(sess)
                 }, 0)
             })
