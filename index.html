@@ -622,6 +622,397 @@
         .authbox .btns[style] {
             align-items: center !important
         }
+
+        [hidden] {
+            display: none !important
+        }
+
+        body.locked .view,
+        body.locked nav {
+            display: none !important
+        }
+
+        body.viewonly .side,
+        body.viewonly .acct,
+        body.viewonly #tabs,
+        body.viewonly #sharebar~* {}
+
+        body.viewonly .side,
+        body.viewonly .acct,
+        body.viewonly #tabs {
+            display: none
+        }
+
+        body.viewonly main {
+            grid-template-columns: 1fr
+        }
+
+        #tabs {
+            display: flex;
+            gap: 6px;
+            padding: 6px 20px;
+            flex-wrap: wrap
+        }
+
+        #tabs button.on {
+            background: var(--acc);
+            border-color: var(--acc);
+            color: #fff
+        }
+
+        :root[data-theme="dark"] #tabs button.on {
+            color: #2a1228
+        }
+
+        .view {
+            padding: 12px 20px 28px
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 14px
+        }
+
+        .hello {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px
+        }
+
+        .hello h2 {
+            font-size: 22px;
+            margin: 0
+        }
+
+        .stats {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .stat {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 99px;
+            padding: 6px 12px;
+            font-weight: 600
+        }
+
+        .li {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .li:last-child {
+            border: 0
+        }
+
+        .li .m {
+            flex: 1;
+            min-width: 0
+        }
+
+        .li b {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .li small,
+        .arow small {
+            color: var(--mute)
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: none
+        }
+
+        .pill2 {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 99px;
+            border: 1px solid var(--line);
+            white-space: nowrap
+        }
+
+        .pill2.bad {
+            color: var(--bad);
+            border-color: var(--bad)
+        }
+
+        .pill2.warn {
+            color: #b8641a;
+            border-color: #e0a060
+        }
+
+        .pill2.ok {
+            color: var(--ok);
+            border-color: var(--ok)
+        }
+
+        .calbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px
+        }
+
+        .calbar h2 {
+            margin: 0 8px;
+            font-size: 17px;
+            min-width: 150px
+        }
+
+        .calbar button.on {
+            background: var(--acc);
+            border-color: var(--acc);
+            color: #fff
+        }
+
+        .mgrid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1px;
+            background: var(--line);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            min-width: 640px
+        }
+
+        .mh {
+            background: var(--bg);
+            text-align: center;
+            font-weight: 600;
+            padding: 5px
+        }
+
+        .mc {
+            background: var(--panel);
+            min-height: 96px;
+            padding: 3px;
+            cursor: pointer;
+            min-width: 0
+        }
+
+        .mc.off {
+            opacity: .5
+        }
+
+        .mc.today {
+            outline: 2px solid var(--acc);
+            outline-offset: -2px
+        }
+
+        .dn0 {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 2px
+        }
+
+        .ev {
+            border-radius: 5px;
+            padding: 1px 5px;
+            margin-top: 2px;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .ev b {
+            display: block;
+            font-size: 12px
+        }
+
+        .ev small {
+            display: block;
+            opacity: .85;
+            white-space: normal
+        }
+
+        .big .ev {
+            white-space: normal;
+            padding: 5px 7px;
+            margin-top: 5px
+        }
+
+        .k-a {
+            background: var(--acc);
+            color: #fff
+        }
+
+        :root[data-theme="dark"] .k-a {
+            color: #2a1228
+        }
+
+        .k-h {
+            background: #bff0d4;
+            color: #14402a
+        }
+
+        .k-e {
+            background: #e3d4ff;
+            color: #2d1b55
+        }
+
+        .dn,
+        .dn b {
+            text-decoration: line-through;
+            opacity: .6
+        }
+
+        .more {
+            color: var(--mute);
+            font-size: 11px
+        }
+
+        .wgrid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(130px, 1fr));
+            gap: 8px;
+            min-width: 940px
+        }
+
+        .wc {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 6px;
+            cursor: pointer
+        }
+
+        .wh {
+            font-weight: 600;
+            margin-bottom: 2px
+        }
+
+        .dayc {
+            max-width: 560px
+        }
+
+        .afm {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            align-items: end
+        }
+
+        .arow {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--line);
+            flex-wrap: wrap
+        }
+
+        .arow .am {
+            flex: 1;
+            min-width: 180px
+        }
+
+        .arow .am b {
+            display: block
+        }
+
+        .arow select {
+            width: auto
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 99px;
+            background: color-mix(in srgb, var(--acc) 18%, transparent);
+            color: var(--acc);
+            margin-right: 6px
+        }
+
+        .bar {
+            height: 8px;
+            border-radius: 9px;
+            background: var(--line);
+            overflow: hidden;
+            margin: 8px 0 3px
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, #ff8fc7, #c7a6ff)
+        }
+
+        .del {
+            padding: 3px 9px
+        }
+
+        .sgrid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+            gap: 14px;
+            align-items: start
+        }
+
+        @media(max-width:900px) {
+            .sgrid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .fg {
+            display: grid;
+            gap: 2px;
+            min-width: 420px
+        }
+
+        .fh {
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px
+        }
+
+        .ft {
+            font-size: 10px;
+            color: var(--mute);
+            text-align: right;
+            padding-right: 4px;
+            line-height: 14px
+        }
+
+        .fc {
+            height: 14px;
+            border-radius: 3px
+        }
+
+        #sharebar {
+            display: none;
+            background: var(--panel);
+            border-bottom: 1px solid var(--line);
+            padding: 10px 20px;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        body.viewonly #sharebar {
+            display: flex
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -656,7 +1047,12 @@
         <div class="acct"><small id="who"></small><small id="sync"></small><button id="logout">Log out</button><button
                 id="theme"></button></div>
     </header>
-    <main>
+    <nav id="tabs"><button data-v="dash">Dashboard</button><button data-v="tt">Timetable</button><button
+            data-v="cal">Calendar</button><button data-v="asg">Assignments</button><button data-v="share">Share &amp;
+            compare</button></nav>
+    <div id="sharebar"><b id="sbt"></b><span style="flex:1"></span><button id="sbadd">Add to my compare
+            list</button><button class="pri" id="sbopen">Open Hōräe</button></div>
+    <main id="v-tt" hidden>
         <div class="side">
             <div class="panel">
                 <h2 id="ftitle">Add a class</h2>
@@ -709,13 +1105,98 @@
                 Check the week numbers before registering.</p>
         </div>
     </main>
+    <section class="view" id="v-dash" hidden></section>
+    <section class="view" id="v-cal" hidden>
+        <div class="panel">
+            <div class="calbar"><button id="cprev" aria-label="Previous">‹</button><button
+                    id="ctoday">Today</button><button id="cnext" aria-label="Next">›</button>
+                <h2 id="clab"></h2><span style="flex:1"></span>
+                <button data-m="month">Month</button><button data-m="week">Week</button><button
+                    data-m="day">Day</button>
+            </div>
+            <details style="margin-bottom:10px">
+                <summary style="cursor:pointer;color:var(--mute)">Add an event · term dates</summary>
+                <div class="afm" style="margin-top:8px">
+                    <div><label for="evt">Event</label><input id="evt" placeholder="e.g. Career fair"></div>
+                    <div><label for="evd">Date</label><input id="evd" type="date"></div>
+                    <div><label for="evtm">Time (optional)</label><input id="evtm" type="time"></div><button class="pri"
+                        id="evadd">Add event</button>
+                </div>
+                <div id="evlist" style="margin:8px 0"></div>
+                <div class="afm">
+                    <div><label for="t0">Week 1 starts (Monday)</label><input id="t0" type="date"></div>
+                    <div><label for="wks">Weeks in term</label><input id="wks" type="number" min="1" max="30"></div>
+                </div>
+                <p class="hint">Classes repeat weekly inside the term and follow week numbers in their notes (e.g.
+                    Wk1-6,8-13). Public holidays are Singapore's (MOM).</p>
+            </details>
+            <div class="scroll" id="calbody"></div>
+        </div>
+    </section>
+    <section class="view" id="v-asg" hidden>
+        <div class="panel" style="margin-bottom:14px">
+            <h2>Add an assignment</h2>
+            <div class="afm">
+                <div><label for="am1">Module</label><input id="am1" list="modlist" placeholder="e.g. CSD1171"><datalist
+                        id="modlist"></datalist></div>
+                <div><label for="at1">Assignment title</label><input id="at1" placeholder="e.g. Project report"></div>
+                <div><label for="ad1">Due date</label><input id="ad1" type="date"></div>
+                <div><label for="atm1">Due time</label><input id="atm1" type="time" value="23:59"></div>
+                <div><label for="ast1">Status</label><select id="ast1">
+                        <option value="todo">Not started</option>
+                        <option value="prog">In progress</option>
+                        <option value="done">Completed</option>
+                    </select></div>
+                <button class="pri" id="aadd">Add</button>
+            </div>
+            <div id="amsg" style="color:var(--bad);font-size:12px;min-height:16px;margin-top:6px"></div>
+        </div>
+        <div class="panel">
+            <div class="status">
+                <h2 style="margin:0">Deadlines</h2><select id="afil" aria-label="Filter" style="width:auto">
+                    <option value="act">Active</option>
+                    <option value="all">All</option>
+                    <option value="done">Completed</option>
+                </select>
+            </div>
+            <div id="aprog"></div>
+            <div id="alist"></div>
+        </div>
+    </section>
+    <section class="view" id="v-share" hidden>
+        <div class="sgrid">
+            <div class="panel">
+                <h2>Share your timetable</h2>
+                <label for="shname">Your name (shown to friends)</label><input id="shname" maxlength="30">
+                <label for="shlink">Share link</label><input id="shlink" readonly>
+                <div class="btns"><button class="pri" id="shcopy">Copy link</button><button id="shnative"
+                        hidden>Share…</button><button id="shimg">Download image</button></div>
+                <div id="shmsg" class="hint"></div>
+                <p class="hint">The link contains your classes (day, time, notes) and nothing else: no email,
+                    assignments or events. Anyone with it can view your weekly timetable. Nothing is stored on a server.
+                </p>
+                <h2 style="margin-top:16px">Friends</h2>
+                <label for="frin">Paste a friend's link</label>
+                <div class="crow"><input id="frin" placeholder="https://…#s=…"><button id="fradd">Add</button></div>
+                <div id="frmsg" style="color:var(--bad);font-size:12px;min-height:16px"></div>
+                <div id="frlist"></div>
+            </div>
+            <div class="panel">
+                <h2>Common free time</h2>
+                <div id="fwin"></div>
+                <p class="hint">Green = everyone free. Pink = someone busy (hover for who). Based on weekly timetables.
+                </p>
+                <div class="scroll" id="fgrid"></div>
+            </div>
+        </div>
+    </section>
     <script>
-        let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in';
+        let sb = null, user = null, cloudReady = false, loadedFor = null, mode = 'in', A = [], EV = [], FR = [], RO = false, curV = 'dash';
         const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], T0 = 360, T1 = 1440, PX = .8;
-        let DEF = { wk: false, v0: 480, v1: 1380, theme: null, title: 'Trimester 2 timetable', ws: '1179x2556' };
+        let DEF = { wk: false, v0: 480, v1: 1380, theme: null, title: 'Trimester 2 timetable', ws: '1179x2556', t0: '2027-01-04', wks: 14, name: '' };
         let S = { ...DEF }, V0 = 480, V1 = 1380, VD = DAYS, LN = {}, CLS = new Set(), sel = new Set(), ccol = null, cchg = false;
         try { Object.assign(S, JSON.parse(localStorage.getItem('tt-set') || '{}')) } catch (_) { }
-        const saveS = () => { try { localStorage.setItem('tt-set', JSON.stringify(S)) } catch (_) { } stamp() };
+        const saveS = () => { if (RO) return; try { localStorage.setItem('tt-set', JSON.stringify(S)) } catch (_) { } stamp() };
         const tm = s => { const [a, b] = s.split(':'); return +a * 60 + +b }, ft = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
         const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const SEED = `CSD1171 - Q1|Tue|10:00|12:00|Wk14 · E2-08-02
@@ -742,7 +1223,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         let TS = 0, cloud = null, quiet = false, timer = null, who = '';
         try { TS = +localStorage.getItem('tt-ts') || 0 } catch (_) { }
         const stamp = () => { if (quiet) return; TS = Date.now(); try { localStorage.setItem('tt-ts', TS) } catch (_) { } push() };
-        const save = () => { try { localStorage.setItem('tt-v1', JSON.stringify(items)) } catch (_) { } stamp() };
+        const save = () => { if (RO) return; try { localStorage.setItem('tt-v1', JSON.stringify(items)) } catch (_) { } stamp() };
         const $ = id => document.getElementById(id);
         $('d').innerHTML = DAYS.map(d => `<option>${d}</option>`).join('');
         const code = n => n.split(' ')[0];
@@ -786,7 +1267,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         // drag and drop (pointer events: mouse and touch)
         let drag = null;
         document.addEventListener('pointerdown', e => {
-            const el = e.target.closest('.chip,.blk'); if (!el) return;
+            if (RO) return; const el = e.target.closest('.chip,.blk'); if (!el) return;
             const it = items.find(x => x.id === el.dataset.id), bank = el.classList.contains('chip');
             if (e.target.closest('input')) return;
             if (e.target.closest('button')) {
@@ -922,6 +1403,161 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         $('wsize').value = S.ws; $('wsize').onchange = e => { S.ws = e.target.value; saveS() };
         theme(); render();
 
+        // ---- planner: dashboard, calendar, assignments, sharing ----
+        const HOL = { '2026-11-09': 'Deepavali (observed)', '2026-12-25': 'Christmas Day', '2027-01-01': "New Year's Day", '2027-02-06': 'Chinese New Year', '2027-02-07': 'Chinese New Year', '2027-02-08': 'Chinese New Year (observed)', '2027-03-10': 'Hari Raya Puasa', '2027-03-26': 'Good Friday', '2027-05-01': 'Labour Day', '2027-05-17': 'Hari Raya Haji', '2027-05-20': 'Vesak Day', '2027-08-09': 'National Day', '2027-10-28': 'Deepavali', '2027-12-25': 'Christmas Day' };
+        try { const o = JSON.parse(localStorage.getItem('tt-pl') || '{}'); A = o.a || []; EV = o.e || [] } catch (_) { }
+        try { FR = JSON.parse(localStorage.getItem('tt-fr') || '[]') } catch (_) { }
+        const saveP = () => { if (RO) return; try { localStorage.setItem('tt-pl', JSON.stringify({ a: A, e: EV })) } catch (_) { } stamp() };
+        const saveF = () => { try { localStorage.setItem('tt-fr', JSON.stringify(FR)) } catch (_) { } };
+        const pd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) };
+        const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const addD = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x };
+        const DN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], ST = [['todo', 'Not started'], ['prog', 'In progress'], ['done', 'Completed']];
+        const wkOf = d => Math.floor(Math.round((pd(iso(d)) - pd(S.t0)) / 864e5) / 7) + 1;
+        const fmtD = k => pd(k).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+        const defName = () => (user && user.email || '').split('@')[0];
+        const nodeUid = () => 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        function wspec(o) { const m = /Wk\s*([\d,\-]+)/i.exec(o || ''); if (!m) return null; const r = new Set(); m[1].split(',').forEach(p => { const [a, b] = p.split('-').map(Number); if (!b) r.add(a); else for (let k = a; k <= b; k++)r.add(k) }); return r }
+        function classesOn(d) { const w = wkOf(d); if (w < 1 || w > S.wks) return []; return items.filter(i => i.p && i.d === DN[d.getDay()] && (!wspec(i.o) || wspec(i.o).has(w))).sort((a, b) => a.s - b.s) }
+        function entries(d) {
+            const k = iso(d), o = [];
+            if (HOL[k]) o.push({ k: 'h', t: HOL[k], time: 'Public holiday', s: -2 });
+            EV.filter(e => e.d === k).forEach(e => o.push({ k: 'e', t: e.t, time: e.tm || 'All day', s: e.tm ? tm(e.tm) : -1 }));
+            A.filter(a => a.d === k).forEach(a => o.push({ k: 'a', t: a.m + ': ' + a.t, time: 'Due ' + (a.tm || '23:59'), s: tm(a.tm || '23:59'), done: a.st === 'done' }));
+            classesOn(d).forEach(i => o.push({ k: 'c', t: i.n, time: ft(i.s) + '–' + ft(i.e), sub: i.o, s: i.s, i }));
+            return o.sort((a, b) => a.s - b.s)
+        }
+        function left(a) { if (a.st === 'done') return { t: 'Completed', c: 'ok' }; const ms = new Date(a.d + 'T' + (a.tm || '23:59')) - Date.now(), ab = Math.abs(ms), d = Math.floor(ab / 864e5), h = Math.floor(ab % 864e5 / 36e5), m = Math.floor(ab % 36e5 / 6e4), t = d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`; return ms < 0 ? { t: 'Overdue by ' + t, c: 'bad' } : { t: t + ' left', c: ms < 1728e5 ? 'warn' : '' } }
+        const chip = (e, big) => {
+            const st = e.k === 'c' ? `background:${bg(e.i)};color:${fg(e.i)};border-left:4px solid ${bd(e.i)}` : '';
+            return `<div class="ev${e.k === 'c' ? '' : ' k-' + e.k}${e.done ? ' dn' : ''}" style="${st}" title="${esc(e.t + ' · ' + e.time)}">${big ? `<b>${esc(e.t)}</b><small>${esc(e.time)}${e.sub ? ' · ' + esc(e.sub) : ''}</small>` : (e.k === 'a' ? '⚑ ' : '') + esc(e.t)}</div>`
+        };
+        const li = (c, t, sub, r) => `<div class="li"><span class="dot" style="background:${c}"></span><div class="m"><b>${esc(t)}</b><small>${esc(sub)}</small></div>${r || ''}</div>`;
+
+        function go(v) {
+            curV = v;['dash', 'tt', 'cal', 'asg', 'share'].forEach(k => $('v-' + k).hidden = k !== v);
+            document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+            ({ dash: renderDash, cal: renderCal, asg: renderAsg, tt: () => { }, share: () => { $('shname').value = S.name || defName(); renderShare() } })[v]()
+        }
+        $('tabs').onclick = e => { const b = e.target.closest('button'); if (b) go(b.dataset.v) };
+
+        function renderDash() {
+            const now = new Date(), nm = now.getHours() * 60 + now.getMinutes(), act = A.filter(a => a.st !== 'done').sort((x, y) => (x.d + x.tm).localeCompare(y.d + y.tm));
+            const td = entries(now), cl = td.filter(e => e.k === 'c'), w = wkOf(now), due7 = act.filter(a => new Date(a.d + 'T' + (a.tm || '23:59')) - now < 6048e5).length, dn = A.filter(a => a.st === 'done').length;
+            const up = []; for (let i = 0; i < 8 && up.length < 6; i++) { const d = addD(now, i); classesOn(d).forEach(c => { if (i > 0 || c.e > nm) up.push({ d, c, i }) }) }
+            const imp = []; for (let i = 0; i < 60 && imp.length < 6; i++) { const d = addD(now, i); entries(d).filter(e => e.k === 'h' || e.k === 'e').forEach(e => imp.push({ d, e })) }
+            const day = i => i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : DN[addD(new Date(), i).getDay()];
+            $('v-dash').innerHTML = `<div class="hello"><div><h2>Hi${defName() ? ', ' + esc(defName()) : ''} ✿</h2><small style="color:var(--mute)">${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}${w >= 1 && w <= S.wks ? ` · Week ${w} of ${S.wks}` : ''}</small></div>
+    <div class="stats"><span class="stat">${cl.length} class${cl.length === 1 ? '' : 'es'} today</span><span class="stat">${due7} due this week</span><span class="stat">${dn}/${A.length} done</span></div></div>
+  <div class="cards">
+  <div class="panel"><h2>Today</h2>${td.map(e => li(e.k === 'c' ? bd(e.i) : e.k === 'a' ? 'var(--acc)' : e.k === 'h' ? '#4cc585' : '#b79cff', e.t, e.time + (e.sub ? ' · ' + e.sub : ''))).join('') || '<p class="hint">Nothing scheduled. Enjoy your day 🎀</p>'}</div>
+  <div class="panel"><h2>Next classes</h2>${up.map(x => li(bd(x.c), x.c.n, `${day(x.i)} · ${ft(x.c.s)}–${ft(x.c.e)}${x.c.o ? ' · ' + x.c.o : ''}`)).join('') || (w < 1 ? `<p class="hint">Term starts ${fmtD(S.t0)} (in ${Math.ceil((pd(S.t0) - now) / 864e5)} days). Your classes will show here then.</p>` : '<p class="hint">No upcoming classes. Place classes in Timetable, and check the term dates in Calendar.</p>')}</div>
+  <div class="panel"><h2>Deadlines</h2>${act.slice(0, 6).map(a => { const l = left(a); return li('var(--acc)', a.t, `${a.m} · ${fmtD(a.d)} ${a.tm || ''}`, `<span class="pill2 ${l.c}">${l.t}</span>`) }).join('') || '<p class="hint">No active assignments 🎉</p>'}<div class="btns"><button onclick="go('asg')">Open assignments</button></div></div>
+  <div class="panel"><h2>Important dates</h2>${imp.map(x => li(x.e.k === 'h' ? '#4cc585' : '#b79cff', x.e.t, fmtD(iso(x.d)) + ' · ' + x.e.time)).join('') || '<p class="hint">None coming up.</p>'}</div></div>`
+        }
+
+        let CAL = { m: 'month', d: new Date() };
+        function renderCal() {
+            const d = CAL.d; let h = '', lab = '';
+            if (CAL.m === 'month') {
+                const f = new Date(d.getFullYear(), d.getMonth(), 1), st = addD(f, -((f.getDay() + 6) % 7)); lab = f.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+                h = '<div class="mgrid">' + DAYS.map(x => `<div class="mh">${x}</div>`).join('');
+                for (let i = 0; i < 42; i++) {
+                    const c = addD(st, i); if (i === 35 && c.getMonth() !== f.getMonth()) break; const en = entries(c);
+                    h += `<div class="mc${c.getMonth() !== f.getMonth() ? ' off' : ''}${iso(c) === iso(new Date()) ? ' today' : ''}" data-d="${iso(c)}"><div class="dn0">${c.getDate()}</div>${en.slice(0, 3).map(e => chip(e)).join('')}${en.length > 3 ? `<small class="more">+${en.length - 3} more</small>` : ''}</div>`
+                }
+                h += '</div>'
+            }
+            else if (CAL.m === 'week') {
+                const st = addD(d, -((d.getDay() + 6) % 7)), w = wkOf(st); lab = `Week of ${st.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}${w >= 1 && w <= S.wks ? ' · Wk ' + w : ''}`;
+                h = '<div class="wgrid big">' + [0, 1, 2, 3, 4, 5, 6].map(i => { const c = addD(st, i); return `<div class="wc" data-d="${iso(c)}"><div class="wh">${DN[c.getDay()]} ${c.getDate()}</div>${entries(c).map(e => chip(e, 1)).join('') || '<small class="hint">Free</small>'}</div>` }).join('') + '</div>'
+            }
+            else {
+                lab = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                h = '<div class="dayc big">' + (entries(d).map(e => chip(e, 1)).join('') || '<p class="hint">Nothing scheduled 🎀</p>') + '</div>'
+            }
+            $('clab').textContent = lab; $('calbody').innerHTML = h;
+            document.querySelectorAll('.calbar [data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === CAL.m));
+            $('t0').value = S.t0; $('wks').value = S.wks;
+            $('evlist').innerHTML = EV.slice().sort((a, b) => a.d.localeCompare(b.d)).map(e => `<span class="tag">${esc(e.t)} · ${fmtD(e.d)} <button class="del" data-ev="${e.id}" aria-label="Delete event">✕</button></span>`).join('');
+        }
+        const step = n => { const d = CAL.d; CAL.d = CAL.m === 'month' ? new Date(d.getFullYear(), d.getMonth() + n, 1) : addD(d, n * (CAL.m === 'week' ? 7 : 1)); renderCal() };
+        $('cprev').onclick = () => step(-1); $('cnext').onclick = () => step(1); $('ctoday').onclick = () => { CAL.d = new Date(); renderCal() };
+        document.querySelectorAll('.calbar [data-m]').forEach(b => b.onclick = () => { CAL.m = b.dataset.m; renderCal() });
+        $('calbody').onclick = e => { const c = e.target.closest('[data-d]'); if (c) { CAL.d = pd(c.dataset.d); CAL.m = 'day'; renderCal() } };
+        $('evadd').onclick = () => { const t = $('evt').value.trim(), d = $('evd').value; if (!t || !d) return; EV.push({ id: nodeUid(), t, d, tm: $('evtm').value || '' }); $('evt').value = ''; saveP(); renderCal() };
+        $('evlist').onclick = e => { const b = e.target.closest('[data-ev]'); if (b) { EV = EV.filter(x => x.id !== b.dataset.ev); saveP(); renderCal() } };
+        $('t0').onchange = e => { if (e.target.value) { S.t0 = e.target.value; saveS(); renderCal() } };
+        $('wks').onchange = e => { S.wks = Math.max(1, Math.min(30, +e.target.value || 14)); saveS(); renderCal() };
+
+        function renderAsg() {
+            $('modlist').innerHTML = [...new Set(items.map(i => code(i.n)).concat(A.map(a => a.m)))].map(m => `<option value="${esc(m)}">`).join('');
+            const f = $('afil').value, L = A.filter(a => f === 'all' || (f === 'act' ? a.st !== 'done' : a.st === 'done')).sort((x, y) => (x.d + x.tm).localeCompare(y.d + y.tm)), dn = A.filter(a => a.st === 'done').length;
+            $('aprog').innerHTML = A.length ? `<div class="bar"><i style="width:${100 * dn / A.length}%"></i></div><small style="color:var(--mute)">${dn} of ${A.length} completed</small>` : '';
+            $('alist').innerHTML = L.length ? L.map(a => { const l = left(a); return `<div class="arow" data-id="${a.id}"><div class="am"><span class="tag">${esc(a.m)}</span><b class="${a.st === 'done' ? 'dn' : ''}" style="display:inline">${esc(a.t)}</b><small style="display:block">Due ${fmtD(a.d)} ${a.tm || '23:59'}</small></div><span class="pill2 ${l.c}">${l.t}</span><select class="st" aria-label="Status">${ST.map(([v, n]) => `<option value="${v}"${a.st === v ? ' selected' : ''}>${n}</option>`).join('')}</select><button class="del" aria-label="Delete assignment">✕</button></div>` }).join('') : '<p class="hint">Nothing here yet.</p>'
+        }
+        $('afil').onchange = renderAsg;
+        $('aadd').onclick = () => {
+            const m = $('am1').value.trim(), t = $('at1').value.trim(), d = $('ad1').value;
+            if (!m || !t || !d) return $('amsg').textContent = 'Add a module, a title and a due date.'; $('amsg').textContent = '';
+            A.push({ id: nodeUid(), m, t, d, tm: $('atm1').value || '23:59', st: $('ast1').value }); $('at1').value = ''; saveP(); renderAsg()
+        };
+        $('alist').onchange = e => { if (!e.target.classList.contains('st')) return; const a = A.find(x => x.id === e.target.closest('.arow').dataset.id); if (a) { a.st = e.target.value; saveP(); renderAsg() } };
+        $('alist').onclick = e => { if (e.target.closest('.del')) { const id = e.target.closest('.arow').dataset.id; A = A.filter(x => x.id !== id); saveP(); renderAsg() } };
+        setInterval(() => { if (!document.hidden && !RO && !$('v-dash').hidden) renderDash(); if (!document.hidden && !RO && !$('v-asg').hidden) renderAsg() }, 60000);
+
+        // sharing + free-time comparison
+        const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        const ub64 = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))) };
+        const mkLink = () => location.href.split('#')[0] + '#s=' + b64(JSON.stringify({ v: 1, n: S.name || defName(), t: S.title, t0: S.t0, w: S.wks, c: items.filter(i => i.p).map(i => [i.n, i.d, i.s, i.e, i.o || '', i.c || '']) }));
+        function parseLink(str) {
+            const m = /#s=([\w\-]+)/.exec(str) || /^([\w\-]{20,})$/.exec(str.trim()); if (!m) return null;
+            try { const o = JSON.parse(ub64(m[1])); if (!Array.isArray(o.c)) return null; return { name: String(o.n || 'Friend').slice(0, 30), title: String(o.t || ''), t0: o.t0, w: o.w, items: o.c.map((r, k) => ({ id: 'f' + k, n: String(r[0]), d: r[1], s: +r[2], e: +r[3], o: String(r[4] || ''), c: /^#[0-9a-f]{6}$/i.test(r[5]) ? r[5] : undefined, p: true })).filter(i => DAYS.includes(i.d) && i.e > i.s) } } catch (_) { return null }
+        }
+        const people = () => [{ n: S.name || defName() || 'Me', items: items.filter(i => i.p) }].concat(FR.filter(f => f.on !== false).map(f => ({ n: f.name, items: f.items })));
+        function renderShare() {
+            $('shlink').value = mkLink(); $('shnative').hidden = !navigator.share;
+            $('frlist').innerHTML = FR.map((f, k) => `<div class="li"><label style="flex:1"><input type="checkbox" data-f="${k}" ${f.on !== false ? 'checked' : ''}> ${esc(f.name)}</label><small>${f.items.length} classes</small><button class="del" data-rm="${k}">Remove</button></div>`).join('') || '<p class="hint">No friends added yet.</p>';
+            renderFree()
+        }
+        function renderFree() {
+            const ps = people(), ds = S.wk ? DAYS : DAYS.slice(0, 5), n = ps.length, fw = {}; ds.forEach(d => fw[d] = []);
+            let h = `<div class="fg" style="grid-template-columns:44px repeat(${ds.length},1fr)"><div></div>` + ds.map(d => `<div class="fh">${d}</div>`).join('');
+            for (let m = 480; m < 1320; m += 30) {
+                h += `<div class="ft">${m % 60 === 0 ? ft(m) : ''}</div>`;
+                ds.forEach(d => {
+                    const b = ps.filter(p => p.items.some(i => i.d === d && i.s < m + 30 && i.e > m)).map(p => p.n);
+                    h += `<div class="fc" style="background:${b.length ? `color-mix(in srgb,var(--bad) ${(25 + 60 * b.length / n) | 0}%,var(--panel))` : '#7ad9a4'}" title="${esc(ft(m) + ' · ' + (b.length ? 'busy: ' + b.join(', ') : 'everyone free'))}"></div>`;
+                    const w = fw[d], l = w[w.length - 1]; if (!b.length) { if (l && l[1] === m) l[1] = m + 30; else w.push([m, m + 30]) }
+                })
+            }
+            $('fgrid').innerHTML = h + '</div>';
+            const t = ds.map(d => { const w = fw[d].filter(x => x[1] - x[0] >= 60); return w.length ? `<li><b>${d}</b> ${w.map(x => ft(x[0]) + '–' + ft(x[1])).join(', ')}</li>` : '' }).join('');
+            $('fwin').innerHTML = `<p class="hint" style="margin:0 0 6px">Comparing ${n} ${n === 1 ? 'person (just you)' : 'people'}: ${ps.map(p => esc(p.n)).join(', ')}</p>` + (t ? `<ul style="margin:0 0 8px;padding-left:18px">${t}</ul>` : '<p class="hint">No shared free slots of an hour or more.</p>')
+        }
+        $('shname').oninput = e => { S.name = e.target.value; saveS(); $('shlink').value = mkLink(); renderFree() };
+        $('shcopy').onclick = async () => { $('shlink').select(); let ok = false; try { await navigator.clipboard.writeText($('shlink').value); ok = true } catch (_) { try { ok = document.execCommand('copy') } catch (_) { } } $('shmsg').textContent = ok ? 'Link copied ✓' : 'Press Ctrl/Cmd+C to copy the selected link.' };
+        $('shnative').onclick = () => navigator.share({ title: (S.title || 'My timetable') + ' · Hōräe', url: $('shlink').value }).catch(() => { });
+        $('shimg').onclick = () => $('png').click();
+        $('fradd').onclick = () => {
+            const f = parseLink($('frin').value); if (!f) return $('frmsg').textContent = "That doesn't look like a Hōräe share link."; $('frmsg').textContent = '';
+            FR = FR.filter(x => x.name !== f.name); FR.push({ name: f.name, items: f.items, on: true }); saveF(); $('frin').value = ''; renderShare()
+        };
+        $('frlist').onclick = e => { const b = e.target.closest('[data-rm]'); if (b) { FR.splice(+b.dataset.rm, 1); saveF(); renderShare() } };
+        $('frlist').onchange = e => { if (e.target.dataset.f != null) { FR[+e.target.dataset.f].on = e.target.checked; saveF(); renderFree() } };
+
+        // view-only mode for shared links
+        if (/#s=/.test(location.hash)) {
+            const sh = parseLink(location.hash); if (sh) {
+                RO = true; quiet = true; items = sh.items; S = { ...DEF, title: sh.title || 'Timetable', t0: sh.t0 || DEF.t0, wks: sh.w || DEF.wks, wk: sh.items.some(i => i.d === 'Sat' || i.d === 'Sun') };
+                document.body.classList.remove('locked'); document.body.classList.add('viewonly');
+                $('sbt').textContent = `${sh.name}'s timetable (view only)`;
+                $('sbadd').onclick = () => { FR = FR.filter(x => x.name !== sh.name); FR.push({ name: sh.name, items: sh.items, on: true }); saveF(); $('sbadd').textContent = 'Added ✓ — log in to compare' };
+                $('sbopen').onclick = () => { location.href = location.href.split('#')[0] };
+                applyUI(); $('ttname').readOnly = true; render(); go('tt')
+            }
+        }
+
         // ---- accounts & cloud sync (Supabase) ----
         const SB_URL = 'https://nhydoheogyfoffgbxrmv.supabase.co', SB_KEY = 'sb_publishable_sJDZS5qfxO1ARumZTHYemA_NfKDYpGI';
 
@@ -932,7 +1568,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             if (!sb || !user || !cloudReady) return;
             $('sync').textContent = 'Saving…'; clearTimeout(timer);
             timer = setTimeout(async () => {
-                const { error } = await sb.from('timetables').upsert({ user_id: user.id, data: { items, S }, updated_at: new Date().toISOString() });
+                const { error } = await sb.from('timetables').upsert({ user_id: user.id, data: { items, S, a: A, e: EV }, updated_at: new Date().toISOString() });
                 $('sync').textContent = error ? 'Not saved' : 'Saved to your account'; $('sync').title = error ? error.message : ''
             }, 700);
         }
@@ -941,17 +1577,18 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             const { data, error } = await sb.from('timetables').select('data').eq('user_id', user.id).maybeSingle();
             if (error) { $('sync').textContent = 'Could not load: ' + error.message; return }
             quiet = true;
-            if (data && data.data) { items = data.data.items || []; S = { ...DEF, ...(data.data.S || {}) } }
-            applyUI(); render(); quiet = false; cloudReady = true;
+            if (data && data.data) { items = data.data.items || []; S = { ...DEF, ...(data.data.S || {}) }; A = data.data.a || []; EV = data.data.e || [] }
+            applyUI(); render(); quiet = false; cloudReady = true; go('dash');
             if (!data) push(); else $('sync').textContent = 'Saved to your account';
         }
         function handle(sess) {
+            if (RO) return;
             if (sess) {
                 user = sess.user; document.body.classList.remove('locked'); $('who').textContent = user.email;
                 if (loadedFor !== user.id) { loadedFor = user.id; loadCloud() }
             }
             else {
-                if (loadedFor) { quiet = true; items = mk(); S = { ...DEF }; try { localStorage.removeItem('tt-v1'); localStorage.removeItem('tt-set'); localStorage.removeItem('tt-ts') } catch (_) { } applyUI(); render(); quiet = false }
+                if (loadedFor) { quiet = true; items = mk(); S = { ...DEF }; A = []; EV = []; FR = []; try { localStorage.removeItem('tt-pl'); localStorage.removeItem('tt-fr'); localStorage.removeItem('tt-v1'); localStorage.removeItem('tt-set'); localStorage.removeItem('tt-ts') } catch (_) { } applyUI(); render(); quiet = false }
                 user = null; loadedFor = null; cloudReady = false; document.body.classList.add('locked');
             }
         }
