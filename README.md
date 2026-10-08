@@ -8,6 +8,8 @@ Hōräe is a student planning web app. Build a weekly timetable by dragging clas
 
 ## Features
 
+![Hōräe screenshot](Assets/dashboard.png)
+
 - **Timetable maker:** drag and drop classes onto a weekly grid, with automatic clash detection (overlaps turn red and sit side by side).
   - A class bank holds classes not yet on your timetable, with multi-select delete.
   - Choose custom colours per class or per module.
