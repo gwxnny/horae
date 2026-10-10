@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Hōräe</title>
+    <title>Horae</title>
+    <link rel="icon" type="image/png" href="Assets/imagees/logo.png">
     <link
         href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@1,500&display=swap"
         rel="stylesheet">
@@ -1058,6 +1059,27 @@
             gap: 6px;
             padding: 6px 0
         }
+
+        @font-face {
+            font-family: "Days of Charity";
+            src: url("Assets/font/Days%20of%20Charity.otf") format("opentype");
+            font-display: swap
+        }
+
+        header h1,
+        .logo {
+            font-family: "Days of Charity", Fraunces, Georgia, serif;
+            font-style: normal;
+            font-weight: 400
+        }
+
+        .logo {
+            font-size: 64px
+        }
+
+        header h1 {
+            font-size: 40px
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1122,8 +1144,7 @@
                 <div class="sbar"><label><input type="checkbox" id="selall"> Select all</label><button id="delsel"
                         disabled>Delete selected</button></div>
                 <div class="bank" id="bank"></div>
-                <div class="btns"><button id="clear">Clear timetable</button><button id="reset">Reload my T2
-                        classes</button></div>
+                <div class="btns"><button id="clear">Clear timetable</button></div>
             </div>
         </div>
         <div class="panel">
@@ -1159,22 +1180,34 @@
                 <button data-m="month">Month</button><button data-m="week">Week</button><button
                     data-m="day">Day</button>
             </div>
-            <details style="margin-bottom:10px">
-                <summary style="cursor:pointer;color:var(--mute)">Add an event · term dates</summary>
-                <div class="afm" style="margin-top:8px">
-                    <div><label for="evt">Event</label><input id="evt" placeholder="e.g. Career fair"></div>
+            <div class="panel" style="margin-bottom:10px;background:var(--bg)">
+                <h2 style="font-size:15px">Add to calendar</h2>
+                <div class="afm">
+                    <div><label for="evk">Type</label><select id="evk">
+                            <option value="e">Event</option>
+                            <option value="a">Assignment deadline</option>
+                        </select></div>
+                    <div id="evmw" hidden><label for="evm">Module</label><input id="evm" list="modlist"
+                            placeholder="e.g. CSD1171"></div>
+                    <div><label for="evt">Title</label><input id="evt" placeholder="e.g. Career fair"></div>
                     <div><label for="evd">Date</label><input id="evd" type="date"></div>
                     <div><label for="evtm">Time (optional)</label><input id="evtm" type="time"></div><button class="pri"
-                        id="evadd">Add event</button>
+                        id="evadd">Add</button>
                 </div>
+                <div id="evmsg" style="color:var(--bad);font-size:12px;min-height:16px"></div>
+                <p class="hint" style="margin:0">Tip: click any day to open it and the date fills in. Click ✕ on an item
+                    below to remove it.</p>
                 <div id="evlist" style="margin:8px 0"></div>
-                <div class="afm">
-                    <div><label for="t0">Week 1 starts (Monday)</label><input id="t0" type="date"></div>
-                    <div><label for="wks">Weeks in term</label><input id="wks" type="number" min="1" max="30"></div>
-                </div>
-                <p class="hint">Classes repeat weekly inside the term and follow week numbers in their notes (e.g.
-                    Wk1-6,8-13). Public holidays are Singapore's (MOM).</p>
-            </details>
+                <details>
+                    <summary style="cursor:pointer;color:var(--mute)">Term dates</summary>
+                    <div class="afm" style="margin-top:8px">
+                        <div><label for="t0">Week 1 starts (Monday)</label><input id="t0" type="date"></div>
+                        <div><label for="wks">Weeks in term</label><input id="wks" type="number" min="1" max="30"></div>
+                    </div>
+                    <p class="hint">Classes repeat weekly inside the term and follow week numbers in their notes (e.g.
+                        Wk1-6,8-13). Public holidays are Singapore's (MOM).</p>
+                </details>
+            </div>
             <div class="scroll" id="calbody"></div>
         </div>
     </section>
@@ -1246,25 +1279,7 @@
         const saveS = () => { if (RO) return; try { localStorage.setItem('tt-set', JSON.stringify(S)) } catch (_) { } stamp() };
         const tm = s => { const [a, b] = s.split(':'); return +a * 60 + +b }, ft24 = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'), ft = m => (S.pf && S.pf.h24 === false) ? ((h, mm) => (h % 12 || 12) + (mm ? ':' + String(mm).padStart(2, '0') : '') + (h < 12 ? ' AM' : ' PM'))(Math.floor(m / 60) % 24, m % 60) : ft24(m);
         const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-        const SEED = `CSD1171 - Q1|Tue|10:00|12:00|Wk14 · E2-08-02
-CSD1171 - L2|Wed|09:00|11:00|Lectorial 9 · Wk1-6,8-13
-CSD1171 - L1|Wed|11:00|13:00|Lectorial 9 · Wk1-6,8-13
-CSD1171 - Q1|Wed|18:00|20:00|Wk6 · E2-08-02
-CSD1171 - P1|Thu|09:00|11:00|Lectorial 9 · Wk1-6,8-13
-CSD1171 - P2|Thu|11:00|13:00|Lectorial 9 · Wk1-6,8-13
-CSD1251 - Q1|Wed|10:00|13:00|Wk14 · SR08 / Lectorial 1
-CSD1251 - T4|Thu|09:00|11:00|E2-2M-05-SR213 · Wk1-6,8-13
-CSD1251 - T3|Thu|11:00|13:00|E2-2M-05-SR213 · Wk1-6,8-13
-CSD1251 - All|Fri|09:00|12:00|Online · Wk1-5,8-13
-CSD1251 - Q1 (Fri)|Fri|09:00|12:00|Wk6 · Lectorial 8
-CSD1451 - P1|Wed|09:00|11:00|E2-08-14 · Wk1-4,6,8-13
-CSD1451 - P2|Wed|11:00|13:00|E2-08-14 · Wk1-4,6,8-13
-CSD1451 - PRJ1|Wed|09:00|11:00|W1-06-04-SR02 · Wk5
-CSD1451 - PRJ2|Wed|11:00|13:00|W1-06-04-SR02 · Wk5
-CSD4902A - W1|Wed|14:00|16:00|Online · Wk3
-CSD1130 - L1|Fri|14:00|16:00|W5-02-01 Lectorial 2 · Wk1-6,8-13
-CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
-        const mk = () => SEED.split('\n').map((l, i) => { const [n, d, s, e, o] = l.split('|'); return { id: 's' + i, n, d, s: tm(s), e: tm(e), o, p: false } });
+        const mk = () => [];
         let items = [], editing = null;
         try { items = JSON.parse(localStorage.getItem('tt-v1') || 'null') || mk() } catch (_) { items = mk() }
         let TS = 0, cloud = null, quiet = false, timer = null, who = '';
@@ -1306,7 +1321,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             $('clashes').innerHTML = pairs.map(([a, b]) => `<p class="clash">${esc(a.n)} overlaps ${esc(b.n)} on ${a.d}</p>`).join('');
             const bk = items.filter(i => !i.p), gr = {}; bk.forEach(i => (gr[code(i.n)] = gr[code(i.n)] || []).push(i));
             sel = new Set([...sel].filter(id => bk.some(i => i.id === id)));
-            $('bank').innerHTML = bk.length ? Object.keys(gr).sort().map(k => `<div class="grp">${esc(k)}</div>` + gr[k].map(i => `<div class="chip" data-id="${i.id}" style="border-left-color:${bd(i)}"><input type="checkbox" class="sel" aria-label="Select ${esc(i.n)}" ${sel.has(i.id) ? 'checked' : ''}><div><b>${esc(i.n)}</b><small>${i.d} ${ft(i.s)}–${ft(i.e)}${i.o ? ' · ' + esc(i.o) : ''}</small></div><button title="Place at its usual time">Place</button></div>`).join('')).join('') : '<p class="hint">Every class is on your timetable.</p>';
+            $('bank').innerHTML = bk.length ? Object.keys(gr).sort().map(k => `<div class="grp">${esc(k)}</div>` + gr[k].map(i => `<div class="chip" data-id="${i.id}" style="border-left-color:${bd(i)}"><input type="checkbox" class="sel" aria-label="Select ${esc(i.n)}" ${sel.has(i.id) ? 'checked' : ''}><div><b>${esc(i.n)}</b><small>${i.d} ${ft(i.s)}–${ft(i.e)}${i.o ? ' · ' + esc(i.o) : ''}</small></div><button title="Place at its usual time">Place</button></div>`).join('')).join('') : (items.length ? '<p class="hint">Every class is on your timetable.</p>' : '<p class="hint">No classes yet. Add your first one with the form above.</p>');
             updSel(); save();
         }
         function updSel() { const n = sel.size, b = items.filter(i => !i.p).length; $('delsel').disabled = !n; $('delsel').textContent = n ? `Delete selected (${n})` : 'Delete selected'; $('selall').checked = b > 0 && n === b }
@@ -1377,7 +1392,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
         $('del').onclick = () => { items = items.filter(x => x.id !== editing); setForm(null); render() };
         $('cancel').onclick = () => setForm(null);
         $('clear').onclick = () => { items.forEach(i => i.p = false); render() };
-        $('reset').onclick = () => { const u = items.filter(i => i.id[0] === 'u'); items = [...mk(), ...u]; sel.clear(); render() };
+
 
         // bank multi-select
         document.addEventListener('change', e => {
@@ -1494,12 +1509,12 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             const up = []; for (let i = 0; i < 8 && up.length < 6; i++) { const d = addD(now, i); classesOn(d).forEach(c => { if (i > 0 || c.e > nm) up.push({ d, c, i }) }) }
             const imp = []; for (let i = 0; i < 60 && imp.length < 6; i++) { const d = addD(now, i); entries(d, 1).filter(e => e.k === 'h' || e.k === 'e').forEach(e => imp.push({ d, e })) }
             const day = i => i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : DN[addD(new Date(), i).getDay()];
-            $('v-dash').innerHTML = `<div class="hello"><div><h2>Hi${defName() ? ', ' + esc(defName()) : ''} ꨄ︎</h2><small style="color:var(--mute)">${now.toLocaleDateString(LOC(), { weekday: 'long', day: 'numeric', month: 'long' })}${w >= 1 && w <= S.wks ? ` · Week ${w} of ${S.wks}` : ''}</small></div>
+            $('v-dash').innerHTML = `<div class="hello"><div><h2>Hi${defName() ? ', ' + esc(defName()) : ''} ✿</h2><small style="color:var(--mute)">${now.toLocaleDateString(LOC(), { weekday: 'long', day: 'numeric', month: 'long' })}${w >= 1 && w <= S.wks ? ` · Week ${w} of ${S.wks}` : ''}</small></div>
     <div class="stats"><span class="stat">${cl.length} class${cl.length === 1 ? '' : 'es'} today</span><span class="stat">${due7} due this week</span><span class="stat">${dn}/${A.length} done</span></div></div>
   <div class="cards">
-  <div class="panel"><h2>Today</h2>${td.map(e => li(e.k === 'c' ? bd(e.i) : e.k === 'a' ? 'var(--acc)' : e.k === 'h' ? '#4cc585' : '#b79cff', e.t, e.time + (e.sub ? ' · ' + e.sub : ''))).join('') || '<p class="hint">Nothing scheduled. Enjoy your day!</p>'}</div>
+  <div class="panel"><h2>Today</h2>${td.map(e => li(e.k === 'c' ? bd(e.i) : e.k === 'a' ? 'var(--acc)' : e.k === 'h' ? '#4cc585' : '#b79cff', e.t, e.time + (e.sub ? ' · ' + e.sub : ''))).join('') || '<p class="hint">Nothing scheduled. Enjoy your day 🎀</p>'}</div>
   <div class="panel"><h2>Next classes</h2>${up.map(x => li(bd(x.c), x.c.n, `${day(x.i)} · ${ft(x.c.s)}–${ft(x.c.e)}${x.c.o ? ' · ' + x.c.o : ''}`)).join('') || (w < 1 ? `<p class="hint">Term starts ${fmtD(S.t0)} (in ${Math.ceil((pd(S.t0) - now) / 864e5)} days). Your classes will show here then.</p>` : '<p class="hint">No upcoming classes. Place classes in Timetable, and check the term dates in Calendar.</p>')}</div>
-  <div class="panel"><h2>Deadlines</h2>${act.slice(0, 6).map(a => { const l = left(a); return li('var(--acc)', a.t, `${a.m} · ${fmtD(a.d)} ${ft(tm(a.tm || '23:59'))}`, `<span class="pill2 ${l.c}">${l.t}</span>`) }).join('') || '<p class="hint">No active assignments!</p>'}<div class="btns"><button onclick="go('asg')">Open assignments</button></div></div>
+  <div class="panel"><h2>Deadlines</h2>${act.slice(0, 6).map(a => { const l = left(a); return li('var(--acc)', a.t, `${a.m} · ${fmtD(a.d)} ${ft(tm(a.tm || '23:59'))}`, `<span class="pill2 ${l.c}">${l.t}</span>`) }).join('') || '<p class="hint">No active assignments 🎉</p>'}<div class="btns"><button onclick="go('asg')">Open assignments</button></div></div>
   <div class="panel"><h2>Important dates</h2>${imp.map(x => li(x.e.k === 'h' ? '#4cc585' : '#b79cff', x.e.t, fmtD(iso(x.d)) + ' · ' + x.e.time)).join('') || '<p class="hint">None coming up.</p>'}</div></div>`
         }
 
@@ -1525,15 +1540,22 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             }
             $('clab').textContent = lab; $('calbody').innerHTML = h;
             document.querySelectorAll('.calbar [data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === CAL.m));
-            $('t0').value = S.t0; $('wks').value = S.wks;
-            $('evlist').innerHTML = EV.slice().sort((a, b) => a.d.localeCompare(b.d)).map(e => `<span class="tag">${esc(e.t)} · ${fmtD(e.d)} <button class="del" data-ev="${e.id}" aria-label="Delete event">✕</button></span>`).join('');
+            $('t0').value = S.t0; $('wks').value = S.wks; if (!$('evd').value) $('evd').value = iso(CAL.d);
+            $('modlist').innerHTML = [...new Set(items.map(i => code(i.n)).concat(A.map(a => a.m)))].map(m => `<option value="${esc(m)}">`).join('');
+            $('evlist').innerHTML = EV.slice().sort((a, b) => a.d.localeCompare(b.d)).map(e => `<span class="tag">${esc(e.t)} · ${fmtD(e.d)} <button class="del" data-ev="${e.id}" aria-label="Delete event">✕</button></span>`).join('') + A.slice().sort((a, b) => a.d.localeCompare(b.d)).map(a => `<span class="tag">⚑ ${esc(a.m)}: ${esc(a.t)} · ${fmtD(a.d)} <button class="del" data-as="${a.id}" aria-label="Delete deadline">✕</button></span>`).join('');
         }
         const step = n => { const d = CAL.d; CAL.d = CAL.m === 'month' ? new Date(d.getFullYear(), d.getMonth() + n, 1) : addD(d, n * (CAL.m === 'week' ? 7 : 1)); renderCal() };
         $('cprev').onclick = () => step(-1); $('cnext').onclick = () => step(1); $('ctoday').onclick = () => { CAL.d = new Date(); renderCal() };
         document.querySelectorAll('.calbar [data-m]').forEach(b => b.onclick = () => { CAL.m = b.dataset.m; renderCal() });
-        $('calbody').onclick = e => { const c = e.target.closest('[data-d]'); if (c) { CAL.d = pd(c.dataset.d); CAL.m = 'day'; renderCal() } };
-        $('evadd').onclick = () => { const t = $('evt').value.trim(), d = $('evd').value; if (!t || !d) return; EV.push({ id: nodeUid(), t, d, tm: $('evtm').value || '' }); $('evt').value = ''; saveP(); renderCal() };
-        $('evlist').onclick = e => { const b = e.target.closest('[data-ev]'); if (b) { EV = EV.filter(x => x.id !== b.dataset.ev); saveP(); renderCal() } };
+        $('calbody').onclick = e => { const c = e.target.closest('[data-d]'); if (c) { CAL.d = pd(c.dataset.d); CAL.m = 'day'; renderCal(); $('evd').value = c.dataset.d } };
+        $('evk').onchange = () => { $('evmw').hidden = $('evk').value !== 'a'; $('evt').placeholder = $('evk').value === 'a' ? 'e.g. Project report' : 'e.g. Career fair' };
+        $('evadd').onclick = () => {
+            const t = $('evt').value.trim(), d = $('evd').value, k = $('evk').value, m = $('evm').value.trim();
+            if (!t || !d) return $('evmsg').textContent = 'Add a title and a date.'; if (k === 'a' && !m) return $('evmsg').textContent = 'Add the module for a deadline.'; $('evmsg').textContent = '';
+            if (k === 'a') A.push({ id: nodeUid(), m, t, d, tm: $('evtm').value || '23:59', st: 'todo' }); else EV.push({ id: nodeUid(), t, d, tm: $('evtm').value || '' });
+            $('evt').value = ''; saveP(); renderCal()
+        };
+        $('evlist').onclick = e => { const b = e.target.closest('[data-ev]'); if (b) { EV = EV.filter(x => x.id !== b.dataset.ev); saveP(); renderCal() } const c = e.target.closest('[data-as]'); if (c) { A = A.filter(x => x.id !== c.dataset.as); saveP(); renderCal() } };
         $('t0').onchange = e => { if (e.target.value) { S.t0 = e.target.value; saveS(); renderCal() } };
         $('wks').onchange = e => { S.wks = Math.max(1, Math.min(30, +e.target.value || 14)); saveS(); renderCal() };
 
@@ -1722,6 +1744,7 @@ CSD1130 - L2|Fri|16:00|18:00|W5-02-01 Lectorial 2 · Wk1-6,8-13`;
             const { data, error } = await sb.from('timetables').select('data').eq('user_id', user.id).maybeSingle();
             if (error) { $('sync').textContent = 'Could not load: ' + error.message; return }
             quiet = true;
+            if (!data) { items = []; S = { ...DEF }; A = []; EV = []; SN = []; FR = []; try { ['tt-v1', 'tt-set', 'tt-pl', 'tt-fr', 'tt-ts'].forEach(k => localStorage.removeItem(k)) } catch (_) { } }
             if (data && data.data) { items = data.data.items || []; S = { ...DEF, ...(data.data.S || {}) }; A = data.data.a || []; EV = data.data.e || []; SN = data.data.sn || [] }
             applyUI(); render(); quiet = false; cloudReady = true; go(pf('sp'));
             if (!data) push(); else $('sync').textContent = 'Saved to your account';
