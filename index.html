@@ -78,6 +78,15 @@
             color: var(--mute)
         }
 
+        header h1 {
+            line-height: 1;
+            margin: 0
+        }
+
+        .acct {
+            align-self: center
+        }
+
         main {
             display: grid;
             grid-template-columns: 300px minmax(0, 1fr);
@@ -376,10 +385,25 @@
         }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 2px 12px
+        }
+
+        header h1 {
+            grid-column: 1;
+            grid-row: 1
+        }
+
+        header .acct {
+            grid-column: 2;
+            grid-row: 1
+        }
+
+        header p {
+            grid-column: 1/-1;
+            grid-row: 2
         }
 
         .tools {
@@ -1088,7 +1112,7 @@
     <div id="auth" role="dialog" aria-labelledby="at">
         <form id="af" class="panel authbox">
             <div class="brand">
-                <div class="logo">Hōräe</div>
+                <div class="logo">Horae</div>
                 <p>Plan your trimester, spot class clashes before you register, and keep your timetable on every device.
                 </p>
                 <div class="pills"><span style="background:#ffd1e8">Mon · 09:00</span><span
@@ -1107,10 +1131,8 @@
         </form>
     </div>
     <header>
-        <div>
-            <h1>Hōräe</h1>
-            <p>Plan your trimester: drag classes onto the week and see clashes before you register.</p>
-        </div>
+        <h1>Horae</h1>
+        <p>Plan your trimester: drag classes onto the week and see clashes before you register.</p>
         <div class="acct"><small id="who"></small><small id="sync"></small><button id="logout">Log out</button><button
                 id="theme"></button></div>
     </header>
@@ -1118,7 +1140,7 @@
             data-v="cal">Calendar</button><button data-v="asg">Assignments</button><button data-v="share">Share &amp;
             compare</button><button data-v="prof">Profile</button><button data-v="set">Settings</button></nav>
     <div id="sharebar"><b id="sbt"></b><span style="flex:1"></span><button id="sbadd">Add to my compare
-            list</button><button class="pri" id="sbopen">Open Hōräe</button></div>
+            list</button><button class="pri" id="sbopen">Open Horae</button></div>
     <main id="v-tt" hidden>
         <div class="side">
             <div class="panel">
@@ -1191,12 +1213,13 @@
                             placeholder="e.g. CSD1171"></div>
                     <div><label for="evt">Title</label><input id="evt" placeholder="e.g. Career fair"></div>
                     <div><label for="evd">Date</label><input id="evd" type="date"></div>
+                    <div id="evrw"><label for="evd2">End date (optional)</label><input id="evd2" type="date"></div>
                     <div><label for="evtm">Time (optional)</label><input id="evtm" type="time"></div><button class="pri"
                         id="evadd">Add</button>
                 </div>
                 <div id="evmsg" style="color:var(--bad);font-size:12px;min-height:16px"></div>
-                <p class="hint" style="margin:0">Tip: click any day to open it and the date fills in. Click ✕ on an item
-                    below to remove it.</p>
+                <p class="hint" style="margin:0">Pick the date yourself. For a multi-day event (trip, exams, holiday)
+                    also pick an end date. Click ✕ on an item below to remove it.</p>
                 <div id="evlist" style="margin:8px 0"></div>
                 <details>
                     <summary style="cursor:pointer;color:var(--mute)">Term dates</summary>
@@ -1460,8 +1483,8 @@
             const t = S.title || 'My timetable'; fit(x, t, Wp - 2 * m, 36 * k); x.fillText(t, Wp / 2, Hp * .305);
             paint(x, m, Hp * .34, Wp - 2 * m, Hp * .58, k, false); out(c, slug() + '-wallpaper.png');
         };
-        $('ttname').value = S.title; document.title = S.title || 'Hōräe';
-        $('ttname').oninput = e => { S.title = e.target.value; document.title = S.title || 'Hōräe'; saveS() };
+        $('ttname').value = S.title; document.title = S.title || 'Horae';
+        $('ttname').oninput = e => { S.title = e.target.value; document.title = S.title || 'Horae'; saveS() };
         $('wsize').value = S.ws; $('wsize').onchange = e => { S.ws = e.target.value; saveS() };
         theme(); render();
 
@@ -1484,7 +1507,7 @@
         function entries(d, all) {
             const L = k => all || pf(k); const k = iso(d), o = [];
             if (HOL[k] && L('lh')) o.push({ k: 'h', t: HOL[k], time: 'Public holiday', s: -2 });
-            (L('le') ? EV : []).filter(e => e.d === k).forEach(e => o.push({ k: 'e', t: e.t, time: e.tm ? ft(tm(e.tm)) : 'All day', s: e.tm ? tm(e.tm) : -1 }));
+            (L('le') ? EV : []).filter(e => e.d <= k && k <= (e.d2 || e.d)).forEach(e => o.push({ k: 'e', t: e.t, time: e.d2 ? (e.d === k ? 'Starts' : e.d2 === k ? 'Ends' : 'Continues') + (e.tm ? ' ' + ft(tm(e.tm)) : '') : e.tm ? ft(tm(e.tm)) : 'All day', s: e.tm ? tm(e.tm) : -1 }));
             (L('la') ? A : []).filter(a => a.d === k).forEach(a => o.push({ k: 'a', t: a.m + ': ' + a.t, time: 'Due ' + ft(tm(a.tm || '23:59')), s: tm(a.tm || '23:59'), done: a.st === 'done' }));
             (L('lc') ? classesOn(d) : []).forEach(i => o.push({ k: 'c', t: i.n, time: ft(i.s) + '–' + ft(i.e), sub: i.o, s: i.s, i }));
             return o.sort((a, b) => a.s - b.s)
@@ -1540,20 +1563,20 @@
             }
             $('clab').textContent = lab; $('calbody').innerHTML = h;
             document.querySelectorAll('.calbar [data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === CAL.m));
-            $('t0').value = S.t0; $('wks').value = S.wks; if (!$('evd').value) $('evd').value = iso(CAL.d);
+            $('t0').value = S.t0; $('wks').value = S.wks;
             $('modlist').innerHTML = [...new Set(items.map(i => code(i.n)).concat(A.map(a => a.m)))].map(m => `<option value="${esc(m)}">`).join('');
-            $('evlist').innerHTML = EV.slice().sort((a, b) => a.d.localeCompare(b.d)).map(e => `<span class="tag">${esc(e.t)} · ${fmtD(e.d)} <button class="del" data-ev="${e.id}" aria-label="Delete event">✕</button></span>`).join('') + A.slice().sort((a, b) => a.d.localeCompare(b.d)).map(a => `<span class="tag">⚑ ${esc(a.m)}: ${esc(a.t)} · ${fmtD(a.d)} <button class="del" data-as="${a.id}" aria-label="Delete deadline">✕</button></span>`).join('');
+            $('evlist').innerHTML = EV.slice().sort((a, b) => a.d.localeCompare(b.d)).map(e => `<span class="tag">${esc(e.t)} · ${fmtD(e.d)}${e.d2 ? ' → ' + fmtD(e.d2) : ''} <button class="del" data-ev="${e.id}" aria-label="Delete event">✕</button></span>`).join('') + A.slice().sort((a, b) => a.d.localeCompare(b.d)).map(a => `<span class="tag">⚑ ${esc(a.m)}: ${esc(a.t)} · ${fmtD(a.d)} <button class="del" data-as="${a.id}" aria-label="Delete deadline">✕</button></span>`).join('');
         }
         const step = n => { const d = CAL.d; CAL.d = CAL.m === 'month' ? new Date(d.getFullYear(), d.getMonth() + n, 1) : addD(d, n * (CAL.m === 'week' ? 7 : 1)); renderCal() };
         $('cprev').onclick = () => step(-1); $('cnext').onclick = () => step(1); $('ctoday').onclick = () => { CAL.d = new Date(); renderCal() };
         document.querySelectorAll('.calbar [data-m]').forEach(b => b.onclick = () => { CAL.m = b.dataset.m; renderCal() });
-        $('calbody').onclick = e => { const c = e.target.closest('[data-d]'); if (c) { CAL.d = pd(c.dataset.d); CAL.m = 'day'; renderCal(); $('evd').value = c.dataset.d } };
-        $('evk').onchange = () => { $('evmw').hidden = $('evk').value !== 'a'; $('evt').placeholder = $('evk').value === 'a' ? 'e.g. Project report' : 'e.g. Career fair' };
+        $('calbody').onclick = e => { const c = e.target.closest('[data-d]'); if (c) { CAL.d = pd(c.dataset.d); CAL.m = 'day'; renderCal() } };
+        $('evk').onchange = () => { $('evmw').hidden = $('evk').value !== 'a'; $('evrw').hidden = $('evk').value === 'a'; $('evt').placeholder = $('evk').value === 'a' ? 'e.g. Project report' : 'e.g. Career fair' };
         $('evadd').onclick = () => {
             const t = $('evt').value.trim(), d = $('evd').value, k = $('evk').value, m = $('evm').value.trim();
             if (!t || !d) return $('evmsg').textContent = 'Add a title and a date.'; if (k === 'a' && !m) return $('evmsg').textContent = 'Add the module for a deadline.'; $('evmsg').textContent = '';
-            if (k === 'a') A.push({ id: nodeUid(), m, t, d, tm: $('evtm').value || '23:59', st: 'todo' }); else EV.push({ id: nodeUid(), t, d, tm: $('evtm').value || '' });
-            $('evt').value = ''; saveP(); renderCal()
+            if (k === 'a') A.push({ id: nodeUid(), m, t, d, tm: $('evtm').value || '23:59', st: 'todo' }); else { const d2 = $('evd2').value; if (d2 && d2 < d) return $('evmsg').textContent = 'End date must be on or after the start date.'; EV.push({ id: nodeUid(), t, d, d2: d2 && d2 > d ? d2 : '', tm: $('evtm').value || '' }) }
+            $('evt').value = ''; $('evd').value = ''; $('evd2').value = ''; saveP(); renderCal()
         };
         $('evlist').onclick = e => { const b = e.target.closest('[data-ev]'); if (b) { EV = EV.filter(x => x.id !== b.dataset.ev); saveP(); renderCal() } const c = e.target.closest('[data-as]'); if (c) { A = A.filter(x => x.id !== c.dataset.as); saveP(); renderCal() } };
         $('t0').onchange = e => { if (e.target.value) { S.t0 = e.target.value; saveS(); renderCal() } };
@@ -1606,10 +1629,10 @@
         }
         $('shname').oninput = e => { S.name = e.target.value; saveS(); $('shlink').value = mkLink(); renderFree() };
         $('shcopy').onclick = async () => { $('shlink').select(); let ok = false; try { await navigator.clipboard.writeText($('shlink').value); ok = true } catch (_) { try { ok = document.execCommand('copy') } catch (_) { } } $('shmsg').textContent = ok ? 'Link copied ✓' : 'Press Ctrl/Cmd+C to copy the selected link.' };
-        $('shnative').onclick = () => navigator.share({ title: (S.title || 'My timetable') + ' · Hōräe', url: $('shlink').value }).catch(() => { });
+        $('shnative').onclick = () => navigator.share({ title: (S.title || 'My timetable') + ' · Horae', url: $('shlink').value }).catch(() => { });
         $('shimg').onclick = () => $('png').click();
         $('fradd').onclick = () => {
-            const f = parseLink($('frin').value); if (!f) return $('frmsg').textContent = "That doesn't look like a Hōräe share link."; $('frmsg').textContent = '';
+            const f = parseLink($('frin').value); if (!f) return $('frmsg').textContent = "That doesn't look like a Horae share link."; $('frmsg').textContent = '';
             FR = FR.filter(x => x.name !== f.name); FR.push({ name: f.name, items: f.items, on: true }); saveF(); $('frin').value = ''; renderShare()
         };
         $('frlist').onclick = e => { const b = e.target.closest('[data-rm]'); if (b) { FR.splice(+b.dataset.rm, 1); saveF(); renderShare() } };
@@ -1644,7 +1667,7 @@
     <p class="hint">Term start date and week count are in Calendar → "Add an event · term dates". Timetable colours stay in the Timetable tab.</p></div>
   <div class="panel"><h2>Notifications</h2>
     <div class="srow"><span>Browser reminders</span>${sc('nOn', 'On')}</div>
-    <p class="hint" style="margin-top:0">Permission: <b>${np}</b>. Reminders appear while Hōräe is open in a browser tab (it can be in the background). They don't work when the page is closed.</p>
+    <p class="hint" style="margin-top:0">Permission: <b>${np}</b>. Reminders appear while Horae is open in a browser tab (it can be in the background). They don't work when the page is closed.</p>
     <div class="srow" style="align-items:flex-start"><span>Remind me before a deadline</span><div class="cks">${sc('n24', '1 day before')}${sc('n3', '3 hours before')}${sc('n1', '1 hour before')}</div></div>
     ${sr('Remind me before a class', so('nc', [[0, 'Off'], [10, '10 minutes'], [15, '15 minutes'], [30, '30 minutes']]))}
     <div class="btns"><button id="ntest">Send a test reminder</button></div></div>
@@ -1661,7 +1684,7 @@
         };
         $('v-set').onclick = e => {
             const t = e.target.closest('button'); if (!t) return;
-            if (t.id === 'ntest') { if (typeof Notification !== 'undefined' && Notification.permission === 'granted') new Notification('Hōräe ✿', { body: 'Reminders are working.' }); else alert('Turn on browser reminders first and allow notifications.') }
+            if (t.id === 'ntest') { if (typeof Notification !== 'undefined' && Notification.permission === 'granted') new Notification('Horae ✿', { body: 'Reminders are working.' }); else alert('Turn on browser reminders first and allow notifications.') }
             if (t.id === 'prst' && confirm('Reset all preferences to defaults?')) { S.pf = {}; saveS(); applyPrefs(); render(); renderSettings() }
             if (t.id === 'frclr' && confirm('Remove all friends from your compare list?')) { FR = []; saveF(); alert('Friends list cleared.') }
         };
@@ -1695,7 +1718,7 @@
     ${f('Display name', 'name')}${f('Programme / major', 'prog', 'e.g. BSc Computer Science')}${f('University', 'uni')}${f('Year / intake', 'yr', 'e.g. Year 2')}
     <p class="hint">Member since ${user && user.created_at ? new Date(user.created_at).toLocaleDateString(LOC(), { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}. Changes save automatically.</p>
     <div class="btns"><button id="pwb">Change password</button><button id="exb">Export my data</button></div></div>
-  <div class="panel"><h2>My Hōräe</h2><div class="pgrid"><div class="pc"><b>${pl}</b>classes on timetable</div><div class="pc"><b>${ks.length}</b>modules</div><div class="pc"><b>${dn}/${A.length}</b>assignments done</div><div class="pc"><b>${EV.length}</b>events</div><div class="pc"><b>${SN.length + 1}</b>saved timetables</div><div class="pc"><b>${FR.length}</b>friends</div></div></div>
+  <div class="panel"><h2>My Horae</h2><div class="pgrid"><div class="pc"><b>${pl}</b>classes on timetable</div><div class="pc"><b>${ks.length}</b>modules</div><div class="pc"><b>${dn}/${A.length}</b>assignments done</div><div class="pc"><b>${EV.length}</b>events</div><div class="pc"><b>${SN.length + 1}</b>saved timetables</div><div class="pc"><b>${FR.length}</b>friends</div></div></div>
   <div class="panel"><h2>Modules</h2>${ks.map(c => { const m = mods[c], as = A.filter(a => a.m === c), ac = as.filter(a => a.st !== 'done').length; return li(bd(m.i), c, `${m.p}/${m.n} classes placed · ${ac} active assignment${ac === 1 ? '' : 's'}`) }).join('') || '<p class="hint">No modules yet.</p>'}</div>
   <div class="panel"><h2>Saved timetables</h2>
     ${li('var(--acc)', S.title || 'My timetable', `Current · ${pl} classes · from ${fmtD(S.t0)}`)}
@@ -1730,7 +1753,7 @@
 
         try { sb = window.supabase.createClient(SB_URL, SB_KEY) } catch (_) { }
         const amsg = (t, ok) => { $('am').textContent = t || ''; $('am').className = ok ? 'info' : '' };
-        function applyUI() { applyPrefs(); CAL.m = pf('cv'); setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Hōräe'; theme() }
+        function applyUI() { applyPrefs(); CAL.m = pf('cv'); setForm(null); $('wk').checked = S.wk; $('v0').value = S.v0; $('v1').value = S.v1; $('ttname').value = S.title; $('wsize').value = S.ws; document.title = S.title || 'Horae'; theme() }
         function push() {
             if (!sb || !user || !cloudReady) return;
             $('sync').textContent = 'Saving…'; clearTimeout(timer);
